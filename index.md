@@ -3,11 +3,8 @@
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
 layout: home
+title: Code, fish and evolution
 ---
-
-# Code, fish and evolution
-
-As stated below:
 
 ![image](/assets/icon.png){:class="img-responsive":height="100px" width="900px"}
 
