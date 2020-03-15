@@ -5,9 +5,13 @@
 layout: home
 ---
 
-![](/assets/icon.png){:class="img-responsive":height="100px" width="900px"}
+# Code, fish and evolution
 
-code, fish and evolution
+As stated below:
+
+![image](/assets/icon.png){:class="img-responsive":height="100px" width="900px"}
+
+
 
 Those are the main motives of my current work. My name is Ulises and I'm a graduate
 student at George Washington University
