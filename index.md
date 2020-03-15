@@ -4,9 +4,10 @@
 
 layout: home
 ---
-# Code, Fish and Evolution
 
 ![](/assets/icon.png){:class="img-responsive":height="100px" width="900px"}
 
-Those are the main motive of my current work. My name is Ulises and I'm a graduate
-sttudent at George Washington University
+code, fish and evolution
+
+Those are the main motives of my current work. My name is Ulises and I'm a graduate
+student at George Washington University
