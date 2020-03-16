@@ -4,11 +4,13 @@
 
 layout: home
 title: Code, fish and evolution
+excerpt: "Homepage"
+header:
+  overlay_image: /assets/icon.png
+#   overlay_filter: 0.1
+  overlay_filter: rgba(28, 146, 202, 0.5)
 ---
-
-![image](/assets/icon.png){:class="img-responsive":height="100px" width="900px"}
-
-
-
-Those are the main motives of my current work. My name is Ulises and I'm a graduate
-student at George Washington University
+This is Ulises and I'm interested in the evolutionary biology of marine
+organisms. This interest has pushed me to spent most of my time developing/using
+bioinformatic tools to answer questions in evolutionary biology and ecology. This
+homepage is designed to ocassionally post some thoughts on code, fish and evolution
