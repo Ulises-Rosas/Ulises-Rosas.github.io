@@ -3,7 +3,7 @@
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
 layout: home
-title: Code, fish and evolution
+title: Code, fish, and evolution
 excerpt: "Homepage"
 header:
   overlay_image: /assets/icon.png

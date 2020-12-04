@@ -3,5 +3,5 @@ title: Research
 permalink: /research/
 ---
 
-* Protacantopterygii phylogeny
+* Protacanthopterygii phylogeny
 * Computational phylogenetics
