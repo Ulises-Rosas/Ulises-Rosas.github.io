@@ -37,7 +37,7 @@ We can get terminal branch length by iterating nodes in 'postorder':
 ```python
 df = {}
 for nd in tree.postorder_edge_iter():
-    if not nd.length:
+    if nd.length is None:
         continue
     taxn = nd.head_node.taxon
     if taxn:
