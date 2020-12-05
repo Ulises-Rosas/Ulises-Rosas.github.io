@@ -67,15 +67,15 @@ print( tree.as_string('newick') )
 ((A:1.0,B:2.0):3.0,((C:0.0,D:0.0):0.0,E:7.0):8.0);
 ```
 
-We can see from the above string that 'C' and 'D' form a single clade and 'E' is the sister taxon of these ones. Now, lets try to collapse these three taxa into a single clade by using a threshold (i.e., `min_edge = 0`):
+We can see from the above string that 'C' and 'D' form a single clade and 'E' is the sister taxon of these ones. Now, lets try to collapse these three taxa into a single clade by using a threshold (i.e., `min_len = 0`):
 
 ```python
-min_edge = 0
+min_len = 0
 
 for nd in tree.postorder_edge_iter():
     if nd.length is None:
         continue
-    if nd.is_internal() and nd.length == min_edge:
+    if nd.is_internal() and nd.length <= min_len:
             nd.collapse()
 
 print( tree.as_string('newick') )
