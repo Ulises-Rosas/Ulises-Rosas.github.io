@@ -266,7 +266,7 @@ $$
 
 
 ### Exact solution
-There are some cases where exact solution can be obtained without the need the need of numerical optimization. This is the case of Jukes-Cantor (JC) and Kimura-2-parameters (K2P) models. For instsance, here is the solution for the K2P model:
+There are some cases where exact solution can be obtained without the need of numerical optimization over the Q matrix. This is the case of Jukes-Cantor (JC) and Kimura-2-parameters (K2P) models. Here is the solution for the K2P model:
 
 $$
 \begin{equation}
@@ -322,7 +322,7 @@ and  $$L_{2} = \begin{bmatrix} 0 & 1 & 0 & 0 \end{bmatrix}$$ represents the base
  $$L_{7}$$ can be expressed in terms of daughter's likelihood and $$P$$ matrix:
 
 $$
-L_{7} = X \times Y =  L_{1} \cdot Q_{(0.2)} \times L_{2} \cdot Q_{(0.2)}
+L_{7} = X \times Y =  L_{1} \cdot P_{(0.2)} \times L_{2} \cdot P_{(0.2)}
 $$
 
 From there it follows the Felsenstein prunning algorithm. Here is an possible implementation of it.
