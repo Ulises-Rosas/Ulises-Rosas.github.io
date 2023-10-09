@@ -119,6 +119,8 @@ Making the dataset and plotting results
 
 ```python
 
+rng = np.random.RandomState(42)
+
 n = 500
 num_test = round(0.30*n)
 
@@ -134,14 +136,17 @@ train_idx = list( set(range(n)) - set(test_idx) )
 X_train, X_test = X[train_idx,:],X[test_idx,:]
 y_train, y_test = y[train_idx]  ,y[test_idx]
 
+
 y_pred = nadayara_watson(X_test, X_train, y_train)
 plt.scatter(X_train,y_train, label='Training set')
 plt.scatter(X_test, y_pred  , c="black", label = 'Nadayara-Watson predictions')
+plt.xlabel('x')
+plt.ylabel('y')
 plt.legend()
 ```
 
 {:refdef: style="text-align: center;"}
-![foo](/assets/images/nada.png){: width="70%" }
+![foo](/assets/images/nada_2.png){: width="70%" }
 {: refdef}
 {:refdef: style="text-align: center;"}
 {: refdef}
