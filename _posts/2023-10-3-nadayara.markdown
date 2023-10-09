@@ -69,19 +69,19 @@ $$
 \frac{\partial}{\partial f}L(\mu, f, f')   = 0
 $$
 
-We can plug the actual equation of the Lagrangian to obtain $f$ :
+Finally, we can plug the actual equation of the lagrangian so that we can obtain $f$ :
 
 $$
 \begin{align}
-\frac{\partial}{\partial f} \left( \sum_{i = 1}^{n} \left\{ f^2 - 2y_if  \right\} \, \delta_{\sigma}(x_i - \mu)  \right) & = 0\\
-\sum_{i = 1}^{n} \left\{ 2f - 2y_i  \right\} \, \delta_{\sigma}(x_i - \mu) & = 0 \\
-\sum_{i = 1}^{n}  f\delta_{\sigma}(x_i - \mu) - \sum_{i = 1}^{n} y_i \,\delta_{\sigma}(x_i - \mu)  & = 0 \\
-f \sum_{i = 1}^{n}  \delta_{\sigma}(x_i - \mu)  & = \sum_{i = 1}^{n} y_i \,\delta_{\sigma}(x_i - \mu) \\
-f  & = \displaystyle  \frac{ \sum_{i = 1}^{n} y_i \,\delta_{\sigma}(x_i - \mu)}{\sum_{i = 1}^{n}  \delta_{\sigma}(x_i - \mu) } \text{ ,}
+\frac{\partial}{\partial f} \left( \sum_{i = 1}^{n} \left\{ f^2 - 2y_if  \right\} \, \delta_{\sigma}(x_i - \mu)  \right)  = 0\\
+\sum_{i = 1}^{n} \left\{ 2f - 2y_i  \right\} \, \delta_{\sigma}(x_i - \mu)  = 0 \\
+\sum_{i = 1}^{n}  f\delta_{\sigma}(x_i - \mu) - \sum_{i = 1}^{n} y_i \,\delta_{\sigma}(x_i - \mu)  = 0 \\
+f \sum_{i = 1}^{n}  \delta_{\sigma}(x_i - \mu)   = \sum_{i = 1}^{n} y_i \,\delta_{\sigma}(x_i - \mu) \\
+f  = \displaystyle  \frac{ \sum_{i = 1}^{n} y_i \,\delta_{\sigma}(x_i - \mu)}{\sum_{i = 1}^{n}  \delta_{\sigma}(x_i - \mu) } \text{ ,}
 \end{align}
 $$
 
-and that, my friends, is the so-called Nadayara-Watson regression.
+and that, my friends, is the so-called [Nadayara-Watson kernel regression](https://en.wikipedia.org/wiki/Kernel_regression).
 
 ## Python implementation
 
@@ -92,23 +92,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 
-
 def gauss(u, sig = 0.5):
     """
     delta dirac
     """
     c1 = 1/( np.sqrt( np.pi ) * sig)
     c2 = -1/( 2*(sig**2) )
-
     return c1*np.exp( c2*( u**2 ) )
 
 def phi1(u,xs):
     return np.sum(gauss(u - xs))
-    
 
 def phi2(u,xs,ys):
     return ys @ gauss( u - xs ) 
-
 
 def nadayara_watson(x_test,x_train,y_train):
 
@@ -116,7 +112,6 @@ def nadayara_watson(x_test,x_train,y_train):
     for i,u in enumerate(x_test):
 
         fu[i] = phi2(u, x_train, y_train)/phi1(u, X_train)
-
     return fu
 ```
 
@@ -138,7 +133,6 @@ train_idx = list( set(range(n)) - set(test_idx) )
 
 X_train, X_test = X[train_idx,:],X[test_idx,:]
 y_train, y_test = y[train_idx]  ,y[test_idx]
-
 
 y_pred = nadayara_watson(X_test, X_train, y_train)
 plt.scatter(X_train,y_train, label='Training set')
