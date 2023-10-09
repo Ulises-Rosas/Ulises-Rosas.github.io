@@ -1,5 +1,5 @@
 ---
-layout: posts
+layout: archive
 title: Branches and dendropy
 date:   2020-12-4
 categories: jekyll update

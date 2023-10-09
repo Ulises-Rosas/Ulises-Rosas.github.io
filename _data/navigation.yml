@@ -8,3 +8,5 @@ main:
     url: /research/
   - title: "Software"
     url: /software/
+  - title: "Blog"
+    url: /year-archive/

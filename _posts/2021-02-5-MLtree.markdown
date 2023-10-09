@@ -1,0 +1,475 @@
+---
+layout: archive
+classes: wide
+title: The likelihood of a tree
+date:   2021-02-05
+categories: jekyll update
+excerpt: "A very fast view and Python implementation"
+---
+
+Consider the following tree: 
+
+{:refdef: style="text-align: center;"}
+![foo](/assets/images/ml_tree.png){: width="40%" }
+{: refdef}
+{:refdef: style="text-align: center;"}
+*Image from Yang 2014*
+{: refdef}
+
+
+<!-- <center><img src="" ...></center>
+<center>This is an image</center> -->
+<!-- {:.image-caption style="text-align: center;"} -->
+
+Nodes from 1 to 5 can depict nucleotides of each species on a given alignment, whose states are known ($$T, C, A ,C, C$$), and nodes 0, 6, 7, and 8 depict internal nodes, whose ancetral states are unknown ($$ x_{0}, x_{6}, x_{7}, x_{8} $$). Assuming that evolution is independent in both sites and lineages, the likelihood of the whole tree is given by the product between likelihood of the site $$ \textbf{x}_{i} $$ (i.e., node state at the root) given model parameters $$ \theta $$ (e.g., branch lengths, transition/transversion rate ratios):
+
+$$
+\begin{equation}
+    L(\theta) = f(X|\theta) = \prod_{i = 1}^{n}f(\textbf{x}_{i}|\theta)
+\end{equation}
+$$
+
+Where $$ f(x)$$ is a function that calculates the likelihood node states. If we apply lagorithms to both sides of the above equation we have:
+
+$$
+\begin{equation}
+    \ell = \ln{ L(\theta) } = \sum_{i}^{n} \ln{ f(\textbf{x}_{i}|\theta) }
+\end{equation}
+$$
+
+Then, we just need to define $$ f(x)$$ and sum all terms of the right side of above equations to get the overall log-likelihood of the tree. 
+
+## The pruning algorithm
+
+The function $$ f(x) $$ can be defined as the sum over all possible combinations of nucleotide change probability from tips to $$ x_{0} $$:
+
+$$
+\begin{equation}
+f(\textbf{x}_{i}| \theta) = \sum_{x_{0}} \sum_{x_{6}} \sum_{x_{7}} \sum_{x_{8}} \left[ 
+\pi_{x_{0}} P_{x_{0},x_{6}}(t_{6}) P_{x_{0},x_{8}}(t_{8})\\
+\hspace{125mm} P_{C,x_{8}}(t_{4}) P_{C,x_{8}}(t_{5}) \\
+\hspace{80mm} P_{A,x_{6}}(t_{3}) P_{x_{6},x_{7}}(t_{7}) \\ 
+\hspace{125mm} P_{T,x_{7}}(t_{1}) P_{C,x_{7}}(t_{2}) \right]
+\end{equation}
+$$
+
+Where $$\pi_{x_{0}}$$ is the stationary probability (e.g., 0.25 for the K80 model), $$ P_{i,j}(t) $$ is the probability of base change $$ i \rightarrow j$$ (or $$ i \leftarrow j$$ due to reversebility of most DNA evolution models) along the branch length $$t$$, obtained from the $$Q$$ matrix (see below). While the above equation is enough to start estimating site likelihoods, the equation is not computationally efficient. For example, let expand the summation of all states in $$x_{8}$$ (i.e., $$A, G, C, T$$):
+
+
+$$
+\begin{equation}
+f(\textbf{x}_{i}| \theta) = \sum_{x_{0}} \sum_{x_{6}} \sum_{x_{7}} \left[ 
+
+\left(\pi_{x_{0}} P_{x_{0},x_{6}}(t_{6}) P_{x_{0},A}(t_{8})\\
+\hspace{115mm} P_{C,A}(t_{4}) P_{C,A}(t_{5}) \\
+\hspace{73mm} P_{A,x_{6}}(t_{3}) P_{x_{6},x_{7}}(t_{7}) \\ 
+\hspace{127mm} P_{T,x_{7}}(t_{1}) P_{C,x_{7}}(t_{2}) \right)+ \\
+
+\hspace{60mm} \vdots\\
+
+\hspace{60mm}\left(\pi_{x_{0}} P_{x_{0},x_{6}}(t_{6}) P_{x_{0},T}(t_{8})\\
+\hspace{115mm} P_{C,T}(t_{4}) P_{C,T}(t_{5}) \\
+\hspace{73mm} P_{A,x_{6}}(t_{3}) P_{x_{6},x_{7}}(t_{7}) \\ 
+\hspace{124mm} P_{T,x_{7}}(t_{1}) P_{C,x_{7}}(t_{2}) \right)\right]
+\end{equation}
+$$
+
+We should have 8 multiplications (i.e., number of nodes - 1) for each base (i.e., 4) and 3 additions (i.e., number of bases - 1). If we denote $$s$$ the number of species and $$b$$ the number of bases, then the number of operations after completely expading above equation is $$ (2sb - b - 1)b^{s - 2} $$. For our tree the number of operations then would be $$(2(5)(4) - 4 - 1)4^{5 - 2} = 2240$$ per site; for s = 20 it is 10,651,518,894,080
+
+The number of operations is huge due to the number of repeated calculations. However, these repeated calculations can be avoided by factorizing the summation:
+
+$$
+\begin{equation}
+f(\textbf{x}_{i}| \theta) = \sum_{x_0} \pi_{x_0} \left\{
+     \sum_{x_6} P_{x_0,x_6}(t_6) \left[ 
+         \left( \sum_{x_7} P_{x_6,x_7}(t_7)P_{x_7,T}(t_1)P_{x_7,C}(t_2) \right)
+         P_{x_6,A}(t_3)
+        \right]\\
+    \times \left[ \sum_{x_8}  P_{x_0,x_8}(t_8)P_{x_8,C}(t_4)P_{x_8,C}(t_5)  \right]
+    \right\}
+\end{equation}
+$$
+
+Above factorization  is analogous to the factorization of $$ x^2 + x $$ into $$ x(x + 1) $$. It might not be apparent at the first sight, but above summation follows the (recursive) shape of the tree. This is the Felsenstein prunning algorithm.
+
+## Transition probability matrix
+
+The probability of a base change takes the form of a Markov matrix (i.e., all elements $\geq 0$, all columns add to 1):
+
+$$ \textbf{p}(t) = \begin{array}{c c c} &
+\begin{array}{c c c c c} T &&& C &&& A &&& G\\ \end{array} 
+\\
+\begin{array}{c c c c} T\\ C\\ A\\ G\\ \end{array} 
+&
+\left[
+\begin{array}{c c c c}
+    % P_{T \rightarrow T}(t) & P_{T \rightarrow C}(t) & P_{T \rightarrow A}(t) & P_{T \rightarrow G}(t)\\
+    % P_{C \rightarrow T}(t) & P_{C \rightarrow C}(t) & P_{C \rightarrow A}(t) & P_{C \rightarrow G}(t)\\
+    % P_{A \rightarrow T}(t) & P_{A \rightarrow C}(t) & P_{A \rightarrow A}(t) & P_{A \rightarrow G}(t)\\
+    % P_{G \rightarrow T}(t) & P_{G \rightarrow C}(t) & P_{G \rightarrow A}(t) & P_{G \rightarrow G}(t)
+    P_{T,T}(t) & P_{T,C}(t) & P_{T,A}(t) & P_{T,G}(t)\\
+    P_{C,T}(t) & P_{C,C}(t) & P_{C,A}(t) & P_{C,G}(t)\\
+    P_{A,T}(t) & P_{A,C}(t) & P_{A,A}(t) & P_{A,G}(t)\\
+    P_{G,T}(t) & P_{G,C}(t) & P_{G,A}(t) & P_{G,G}(t)
+
+\end{array}
+\right] 
+\end{array}
+$$
+
+And a property of the Markov process is $$ \textbf{p}(t_{1} + t_{2}) =  \textbf{p}(t_{1})\textbf{p}(t_{2}) = \textbf{p}(t_{2})\textbf{p}(t_{1})$$ (Chapman-Kolgomorov equation). If we substract $$ \textbf{p}(t_{1}) $$ at both sides we have:
+
+$$
+\begin{equation}
+\textbf{p}(t_{1} + t_{2}) - \textbf{p}(t_{1}) =  \textbf{p}(t_{2})\textbf{p}(t_{1}) - \textbf{p}(t_{1})\\
+\textbf{p}(t_{1} + t_{2}) - \textbf{p}(t_{1}) =  (\textbf{p}(t_{2}) - \textbf{I})\textbf{p}(t_{1})
+\end{equation}
+$$
+
+Notice that the identity matrix $$\textbf{I}$$ is equivalent to $$\textbf{p}(0)$$ as it is a diagonal of ones, thus no base change. Then, substituting $$\textbf{p}(0)$$ into above equation and applying limits with respect of $$t_{2}$$:
+
+$$
+\begin{equation}
+\textbf{p}(t _1 + t_2) - \textbf{p}(t_1) =  (\textbf{p}(t_2) - \textbf{p}(0))\textbf{p}(t_1)\\
+
+\lim_{t_2 \to 0} \frac{ \textbf{p}(t_1 + t_2) - \textbf{p}(t_1) }{t_2} = \lim_{t_2 \to 0} \frac{\textbf{p}(t_2) - \textbf{p}(0)}{t_2}\textbf{p}(t_1)
+\end{equation}
+$$
+
+Letting $$t_2$$ be $$ \Delta t $$, and putting a more straightforward format at the right hand side of above equation:
+
+$$
+\begin{equation}
+\lim_{\Delta t \to 0} \frac{ \textbf{p}(t_1 + \Delta t) - \textbf{p}(t_1) }{\Delta t} = \lim_{\Delta t \to 0}\frac{\textbf{p}( 0 +  \Delta t) - \textbf{p}(0)}{\Delta t} \textbf{p}(t_1)\\
+\textbf{p}^{\prime}(t_1) = \textbf{p}^{\prime}(0)\textbf{p}(t_1)
+\end{equation}
+$$
+
+The rate of change of the probability matrix at $$t = 0$$, $$\textbf{p}^{\prime}(0)$$, is also know as the $$ \textbf{Q} $$ matrix or instantaneous rate of change. We end up having the general form for matrix differentiation:
+
+$$
+\begin{equation}
+\textbf{p}^{\prime}(t) = \textbf{Q}\textbf{p}(t)
+\end{equation}
+$$
+
+<!-- ---
+**NOTE**
+
+It works with almost all markdown flavours (the below blank line matters).
+
+--- -->
+<!-- > **_NOTE:_**  The rate of change of the probability matrix at $$t = 0$$, $$\textbf{p}^{\prime}(0)$$, is also know as the $$ \textbf{Q} $$ matrix or instantaneous rate of change. Then, changing $$\textbf{p}^{\prime}(0)$$ by $$ \textbf{Q} $$, and $$t_1$$ by $$t$$, we have the general form for matrix differentiation: -->
+
+### Approximated solution
+
+The general solution of a matrix differentiation for any $$t$$ is (see Box 1 for more details):
+
+$$
+\begin{equation}
+\textbf{p}(t) = e^{ \textbf{Q}t  }\textbf{p}(0) = e^{ \textbf{Q}t  }\textbf{I} = e^{ \textbf{Q}t  }
+\end{equation}
+$$
+
+Then, we can approximate $$ \textbf{p}(t) $$ with the exponential of the matrix:
+
+$$
+\begin{equation}
+\textbf{p}(t) = e^{ \textbf{Q}t } =  \frac{1}{0!}(\textbf{Q}t)^0 + \frac{1}{1!}(\textbf{Q}t)^1 + \frac{1}{2!}(\textbf{Q}t)^2 + \cdots\\
+\textbf{p}(t) =  \textbf{I} + \textbf{Q}t + \frac{1}{2!}(\textbf{Q}t)^2 + \cdots\\
+\end{equation}
+$$
+
+Observations: i) $$ \textbf{p}(t) $$ is in function of time and the initial value $$\textbf{Q} $$, ii)  $$\textbf{Q} $$ contains information of the evolutionary model, iii) while above summation converges into a specific matrix in function of the number of terms considered, eigenvalue decomposition could have also been used.
+
+
+
+
+<div class="warning" style='background-color:#E9D8FD; color: #69337A; border-left: solid #805AD5 4px; border-radius: 4px; padding:0.7em;'>
+<span>
+<p style='margin-top:1em; text-align:center'>
+<b>Box 1: Glimpse on matrix differentiation</b></p>
+<p style='margin-left:1em;'>
+
+Let $ \textbf{x} $ be a column vector and $ \textbf{A} $ be an invertible matrix. If we have the following form of vector differentiation: $ \textbf{x}^{\prime}  = \textbf{A}\textbf{x} $, we know its solution is $ \textbf{x}(t) =  e^{ \textbf{A}t } \textbf{x}(0) $. However, above solution form also holds when we have an square matrix such as $ \textbf{p}^{\prime} $. For example, if we represent $ \textbf{p}^{\prime} = \textbf{Q}\textbf{p} $ as:
+
+$$
+\begin{bmatrix} |                     &        & |                    \\
+                \textbf{p}^{\prime}_1 & \cdots & \textbf{p}^{\prime}_n\\
+                |                     &        & |                    \end{bmatrix}  = 
+\begin{bmatrix} - &  \textbf{q}_1 & - \\
+                  & \vdots                 &   \\
+                - &  \textbf{q}_n & -  \end{bmatrix} 
+\begin{bmatrix} |            &        & |           \\
+                \textbf{p}_1 & \cdots & \textbf{p}_n\\
+                |            &        & |           \end{bmatrix}\\
+
+
+\begin{bmatrix} |                     &        & |                    \\
+                \textbf{p}^{\prime}_1 & \cdots & \textbf{p}^{\prime}_n\\
+                |                     &        & |                    \end{bmatrix}  = 
+\begin{bmatrix} \textbf{q}_1\textbf{p}_1 & \cdots & \textbf{q}_1\textbf{p}_n \\
+                \vdots                   & \ddots & \vdots                    \\
+                \textbf{q}_n\textbf{p}_1 & \cdots & \textbf{q}_n\textbf{p}_n  \end{bmatrix} 
+$$
+
+and taking only the first column from above matrices:
+
+$$
+\begin{bmatrix} |                     \\
+                \textbf{p}^{\prime}_1 \\
+                |                     \end{bmatrix}  = 
+\begin{bmatrix} \textbf{q}_1\textbf{p}_1 \\
+                \vdots                   \\
+                \textbf{q}_n\textbf{p}_1  \end{bmatrix} = 
+
+\begin{bmatrix} - & \textbf{q}_1 & - \\
+                  & \vdots       &   \\
+                - & \textbf{q}_n & - \end{bmatrix} 
+\begin{bmatrix} |            \\
+                \textbf{p}_1 \\
+                |  \end{bmatrix}  = \textbf{Q}\textbf{p}_1
+$$
+
+$\textbf{p}^{\prime}_1$ column vector can be directly solved:
+
+$$
+\textbf{p}^{\prime}_1 = \textbf{Q}\textbf{p}_1 \Rightarrow  \textbf{p}_1(t) =  e^{ \textbf{Q}t } \textbf{p}_1(0)
+$$
+
+Plugging back all solved columns into the original matrix:
+
+$$
+\begin{bmatrix} |               &        & |              \\
+                \textbf{p}_1(t) & \cdots & \textbf{p}_n(t)\\
+                |               &        & |              \end{bmatrix}  = 
+\begin{bmatrix} |                                 &        & |                                \\
+                e^{ \textbf{Q}t } \textbf{p}_1(0) & \cdots & e^{ \textbf{Q}t } \textbf{p}_n(0)\\
+                |                                 &        & |                                 \end{bmatrix}\\
+
+\begin{bmatrix} |               &        & |              \\
+                \textbf{p}_1(t) & \cdots & \textbf{p}_n(t)\\
+                |               &        & |              \end{bmatrix}  = 
+e^{ \textbf{Q}t }\begin{bmatrix} |               &        & |              \\
+                                 \textbf{p}_1(0) & \cdots & \textbf{p}_n(0)\\
+                                 |               &        & |               \end{bmatrix}\\
+
+\Rightarrow \textbf{p}(t) = e^{ \textbf{Q}t }\textbf{p}(0)
+$$
+
+
+</p>
+
+</span>
+</div>
+
+
+
+### Exact solution
+There are some cases where exact solution can be obtained without the need the need of numerical optimization. This is the case of Jukes-Cantor (JC) and Kimura-2-parameters (K2P) models. For instsance, here is the solution for the K2P model:
+
+$$
+\begin{equation}
+P_{i,j}(d)=\begin{cases}
+              \frac{1}{4}( 1 + e^{-4d/(k+2)} + 2e^{-2d(k+1)/(k+2)}) &, \text{if i = j }\\
+              \frac{1}{4}( 1 + e^{-4d/(k+2)} - 2e^{-2d(k+1)/(k+2)}) &, \text{if transition}\\
+              \frac{1}{4}( 1 - e^{-4d/(k+2)} ) &, \text{if transversion}\\
+             \end{cases}
+\end{equation}            
+$$
+
+Where transition/transversion ratio is given by $$k = \alpha/\beta$$ and the coefficient $$d = (\alpha + 2\beta)t$$ is a used as a proxy of time/distance between two bases. To obtain the full solution for the K2P model, the so-called 'integrating factors' trick should be used in the middle of the derivations.
+
+
+## Python implementation
+To obtain the probabilities of the tips we know that:
+
+$$L_{7}(T) = P_{TT}(0.2) \times P_{TC}(0.2) = 0.825 \times 0.084 = 0.069$$
+$$L_{7}(C) = P_{CT}(0.2) \times P_{CC}(0.2) = 0.084 \times 0.825 = 0.069$$
+$$L_{7}(A) = P_{AT}(0.2) \times P_{AC}(0.2) = 0.045 \times 0.045 = 0.002$$
+$$L_{7}(G) = P_{GT}(0.2) \times P_{GC}(0.2) = 0.045 \times 0.045 = 0.002$$
+
+
+But, this can also be re-written as:
+
+$$
+L_{7} = \begin{bmatrix} 0.069 & 0.069 & 0.002 & 0.002 \end{bmatrix} =\\ 
+		\begin{bmatrix} 0.825 & 0.084 & 0.045 & 0.045 \end{bmatrix} \times
+		\begin{bmatrix} 0.084 & 0.825 & 0.045 & 0.045 \end{bmatrix} =\\
+		X \times Y
+$$
+
+In turn, $$X$$ and $$Y$$ can be re-written as:
+
+$$
+X = \begin{bmatrix} 1 & 0 & 0 & 0 \end{bmatrix} \cdot 
+    \begin{bmatrix} 0.825 & 0.084 & 0.045 & 0.045\\
+                    0.084 & 0.825 & 0.045 & 0.045\\
+                    0.045 & 0.045 & 0.825 & 0.084\\
+                    0.045 & 0.045 & 0.084 & 0.825 \end{bmatrix}
+$$
+
+$$
+Y = \begin{bmatrix} 0 & 1 & 0 & 0 \end{bmatrix} \cdot 
+    \begin{bmatrix} 0.825 & 0.084 & 0.045 & 0.045\\
+                    0.084 & 0.825 & 0.045 & 0.045\\
+                    0.045 & 0.045 & 0.825 & 0.084\\
+                    0.045 & 0.045 & 0.084 & 0.825 \end{bmatrix}
+$$
+
+Where $$L_{1} = \begin{bmatrix} 1 & 0 & 0 & 0 \end{bmatrix}$$ represents the base T at the terminal node 1
+and  $$L_{2} = \begin{bmatrix} 0 & 1 & 0 & 0 \end{bmatrix}$$ represents the base C at the terminal node 2. Then,
+ $$L_{7}$$ can be expressed in terms of daughter's likelihood and $$P$$ matrix:
+
+$$
+L_{7} = X \times Y =  L_{1} \cdot Q_{(0.2)} \times L_{2} \cdot Q_{(0.2)}
+$$
+
+From there it follows the Felsenstein prunning algorithm. Here is an possible implementation of it.
+
+
+```python
+import math
+import numpy as np
+```
+
+### Kimura's two-parameters 
+
+Kimura's two-parameters equation for comparing two bases ($$i, j$$):
+```python
+def k2p(i, j, d, k):
+    _lib = {
+        'A': 'G', 'G': 'A',
+        'T': 'C', 'C': 'T'
+        }
+    first_t =lambda d,k:math.exp(-4*( d/(k+2) ))
+    second_t=lambda d,k:2*math.exp(-2*( d*(k+1)/(k+2) ))
+    
+    if i == j:
+        # equal base
+        return 0.25*(1 + first_t(d,k) + second_t(d,k))
+    else:
+        if _lib[i] == j:
+            # transition
+            return 0.25*(1 + first_t(d,k) - second_t(d,k))
+        else:
+            # transversion
+            return 0.25*(1 - first_t(d,k))
+
+```
+P matrix implementation:
+```python
+def P_mat(d,k):
+    """
+    P matrix
+    """
+    bases = ['T', 'C', 'A', 'G']
+    return np.array([
+                [k2p(bases[0], i, d, k) for i in bases],
+                [k2p(bases[1], i, d, k) for i in bases],
+                [k2p(bases[2], i, d, k) for i in bases],
+                [k2p(bases[3], i, d, k) for i in bases]
+            ])
+
+```
+
+<!-- 
+\left[\matrix{a^2-b^2& -1\\ 1& 2ab}\right] -->
+
+My tree:
+
+```python
+tree = {   
+  0: {'data': None, 'daughters': [6, 8], 'parent': None},
+  1: {'data': [1, 0, 0, 0], 'daughters': [], 'parent': 7},
+  2: {'data': [0, 1, 0, 0], 'daughters': [], 'parent': 7},
+  3: {'data': [0, 0, 1, 0], 'daughters': [], 'parent': 6},
+  4: {'data': [0, 1, 0, 0], 'daughters': [], 'parent': 8},
+  5: {'data': [0, 1, 0, 0], 'daughters': [], 'parent': 8},
+  6: {'data': None, 'daughters': [3, 7], 'parent': 0},
+  7: {'data': None, 'daughters': [1, 2], 'parent': 6},
+  8: {'data': None, 'daughters': [4, 5], 'parent': 0} }
+```
+
+
+```python
+
+terminal_q = P_mat(0.2, 2)
+internal_q = P_mat(0.1, 2)
+
+def update_probs(tree, node):
+    probs     = np.array(tree[node]['data'])
+    daughters = tree[node]['daughters']
+    if not daughters:
+        return probs.dot(terminal_q)
+
+    else:
+        return probs.dot(internal_q)
+```
+
+### Recursive function
+
+```python
+def update_recursively(node):
+    print(node)
+
+    if node is not None:
+        daughters = tree[node]['daughters']
+        no_data = [ d for d in daughters if tree[d]['data'] is None ]
+
+        if no_data:
+            return update_recursively(no_data[0])
+
+        new_prob = np.ones((4,))
+        for d in daughters:
+            new_prob *= update_probs(tree, d)
+
+        tree[node]['data'] = new_prob
+        anc_node = tree[node]['parent']
+        return update_recursively(anc_node)
+```
+Let's run this function from the node 0
+
+```python
+update_recursively(node = 0)
+0
+6
+7
+6
+0
+8
+0
+None
+```
+
+Now, if we see our initial tree:
+```python
+print(tree)
+```
+```
+{   
+  0: {'data': array([1.120e-04, 1.838e-03, 7.500e-05, 1.400e-05]),
+      'daughters': [6, 8],
+      'parent': None},
+  1: {'data': [1, 0, 0, 0], 'daughters': [], 'parent': 7},
+  2: {'data': [0, 1, 0, 0], 'daughters': [], 'parent': 7},
+  3: {'data': [0, 0, 1, 0], 'daughters': [], 'parent': 6},
+  4: {'data': [0, 1, 0, 0], 'daughters': [], 'parent': 8},
+  5: {'data': [0, 1, 0, 0], 'daughters': [], 'parent': 8},
+  6: {'data': array([0.00300556, 0.00300556, 0.00434364, 0.00044365]),
+      'daughters': [3, 7],
+      'parent': 0},
+  7: {'data': array([0.06953344, 0.06953344, 0.00205366, 0.00205366]),
+      'daughters': [1, 2],
+      'parent': 6},
+  8: {'data': array([0.00710204, 0.68077648, 0.00205366, 0.00205366]),
+      'daughters': [4, 5],
+      'parent': 0}}
+```
+
+
+References:
+
+1. Yang, Z. (2014). Molecular evolution: a statistical approach. Oxford University Press.
+2. Felenstein, J. (2004). Inferring phylogenies. Sunderland, MA: Sinauer associates.
+3. Pupko, T., & Mayrose, I. (2020). A gentle introduction to probabilistic evolutionary models.

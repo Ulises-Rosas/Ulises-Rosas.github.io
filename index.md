@@ -7,7 +7,6 @@ title: Code, fish, and evolution
 excerpt: "Homepage"
 header:
   overlay_image: /assets/icon.png
-#   overlay_filter: 0.1
   overlay_filter: rgba(28, 146, 202, 0.5)
 ---
 This is Ulises and I'm interested in the evolutionary biology of marine
