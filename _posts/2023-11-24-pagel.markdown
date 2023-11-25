@@ -190,7 +190,7 @@ For the right-hand side differentiation, we used this property: $\partial (\math
 
 ### But we can use numerical optimization
 
-From above expression we could proposed the following optimization problem:
+From above derivations, we can propose the following optimization problem:
 
 $$
 \begin{align*}
@@ -207,7 +207,7 @@ $$
 
 where $\lambda$ is the unique decision variable. 
 
-Making the functions:
+Here is a set of functions to optimize the above problem:
 
 ```python
 from scipy.optimize import minimize
@@ -242,7 +242,7 @@ def optimize_problem(X, y, Sigma):
     return result
 ```
 
-Testing two trees:
+Testing in two trees:
 
 ```python
 np.random.seed(123)
