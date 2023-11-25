@@ -294,9 +294,9 @@ But, this can also be re-written as:
 
 $$
 L_{7} = \begin{bmatrix} 0.069 & 0.069 & 0.002 & 0.002 \end{bmatrix} =\\ 
-		\begin{bmatrix} 0.825 & 0.084 & 0.045 & 0.045 \end{bmatrix} \times
+		\begin{bmatrix} 0.825 & 0.084 & 0.045 & 0.045 \end{bmatrix}  \odot
 		\begin{bmatrix} 0.084 & 0.825 & 0.045 & 0.045 \end{bmatrix} =\\
-		X \times Y
+		X  \odot Y
 $$
 
 In turn, $$X$$ and $$Y$$ can be re-written as:
@@ -322,7 +322,7 @@ and  $$L_{2} = \begin{bmatrix} 0 & 1 & 0 & 0 \end{bmatrix}$$ represents the base
  $$L_{7}$$ can be expressed in terms of daughter's likelihood and $$P$$ matrix:
 
 $$
-L_{7} = X \times Y =  L_{1} \cdot P_{(0.2)} \times L_{2} \cdot P_{(0.2)}
+L_{7} = X  \odot Y =  L_{1} \cdot P_{(0.2)} \odot L_{2} \cdot P_{(0.2)}
 $$
 
 From there it follows the Felsenstein prunning algorithm. Here is an possible implementation of it.

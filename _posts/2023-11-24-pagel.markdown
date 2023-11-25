@@ -1,0 +1,282 @@
+---
+layout: archive
+classes: wide
+title: Does Pagel's lambda create a positive semi-definite covariance matrix?
+date:   2023-11-24
+categories: jekyll update
+excerpt: "Yes!"
+---
+
+In phylogenetic regression, which is a form of linear regression involving multiple species observations, Pagel's lambda indicates the extent to which covariance between observations is necessary to maximize the data's likelihood. This concept is known as the phylogenetic signal in this context and has links to linear mixed models, as we will explore. However, since it is a parameter that affects only the covariances (i.e., the off-diagonal values of the covariance matrix) through multiplication, it was initially unclear to me why the resulting new covariance matrix would still be a positive semi-definite (PSD) matrix. Being PSD confers great properties, such as invertibility, real eigenvalues, and spectral decomposition. With this in mind, I would like to present a brief proof of this property and follow up with some remarks on how to estimate this parameter.
+
+**Proposition**. *Let $\textbf{C}_{\lambda} \in \mathbb{R}^{n \times n}$ be the transformed covariance matrix $\Omega \in \mathbb{R}^{n \times n}$ with off-diagonal elements multiplied by the scalar $\lambda \in [0,1]$  such that*: 
+
+$$
+\textbf{C}_{\lambda} =
+\begin{bmatrix}
+\sigma^2_{11}        & \lambda\sigma_{12}  & \dots    & \lambda \sigma_{1n}  \\
+\lambda\sigma_{21} & \sigma^2_{22} & \dots            & \lambda\sigma_{2n}\\
+\vdots & \vdots & \ddots & \vdots \\
+\lambda\sigma_{n1} & \lambda\sigma_{n2} & \dots  & \sigma^2_{nn} \\
+\end{bmatrix} \text{.}
+$$
+
+*Then, $\textbf{C}_{\lambda}$ is positive semi-definite matrix*.
+
+**Proof**. We can re-write $\mathbf{C}_{\lambda}$ as the following:
+
+$$
+\begin{align}
+\textbf{C}_{\lambda}& = 
+
+\lambda\begin{bmatrix}
+\sigma^2_{11}        &\sigma_{12}  & \dots    & \sigma_{1n}  \\
+\sigma_{21} & \sigma^2_{22} & \dots    & \sigma_{2n}\\
+\vdots & \vdots & \ddots & \vdots \\
+\sigma_{n1} & \sigma_{n2} & \dots  & \sigma^2_{nn} \\
+\end{bmatrix} +
+
+(1 - \lambda)\begin{bmatrix}
+\sigma^2_{11}  & 0  & \dots    & 0  \\
+0    & \sigma^2_{22} & \dots    & 0\\
+\vdots        & \vdots & \ddots & \vdots \\
+0   & 0 & \dots  & \sigma^2_{nn} \\
+\end{bmatrix}
+ \\\\
+& = \lambda \Omega + (1-\lambda) \mathbf{W} \, \text{.}
+\end{align}
+$$
+
+Now, $\Omega$ can be defined as the covariance matrix of some random variable $\mathbf{x} \in \mathbb{R}^{n \times 1}$, with probability density $p(\mathbf{x})$, and expectation $\mu$:
+
+$$
+\begin{align}
+\textbf{C}_{\lambda} & = \lambda\text{E}[ (\mathbf{x} - \mu)(\mathbf{x} - \mu)^\top] + (1-\lambda)\mathbf{W} \\
+& = \lambda\int_{\mathbb{R}}   p(\mathbf{x}) (\mathbf{x} - \mu)(\mathbf{x} - \mu)^\top   \, d\mathbf{x} + (1-\lambda)\mathbf{W} \, \text{.}
+\end{align}
+$$
+
+Finally, let $\mathbf{u} \in \mathbb{R}^{n \times 1}$ be any vector different than 0 such that:
+
+$$
+\begin{align}
+\mathbf{u}^\top\textbf{C}_{\lambda}\mathbf{u} & = \lambda\int_{\mathbb{R}}   p(\mathbf{x}) \, \mathbf{u}^\top(\mathbf{x} - \mu)(\mathbf{x} - \mu)^\top\mathbf{u}   \, d\mathbf{x} + (1-\lambda)\mathbf{u}^\top\mathbf{W}\mathbf{u}\\ 
+& = \lambda\int_{\mathbb{R}}   p(\mathbf{x}) \, \{(\mathbf{x} - \mu)^\top\mathbf{u}\}^\top(\mathbf{x} - \mu)^\top\mathbf{u}   \, d\mathbf{x} + (1-\lambda)\mathbf{u}^\top\mathbf{W}^{1/2}\mathbf{W}^{1/2}\mathbf{u} \\
+& = \lambda\int_{\mathbb{R}}   p(\mathbf{x}) \, ||(\mathbf{x} - \mu)^\top\mathbf{u}||^2   \, d\mathbf{x} + (1-\lambda) ||\mathbf{W}^{1/2}\mathbf{u}||^2 \geq 0 \text{ .}
+\end{align}
+$$
+
+Since $\mathbf{u}^\top\textbf{C}_{\lambda} \mathbf{u} \geq 0$ for any $\mathbf{u} \neq 0$, then 
+
+$\textbf{C}_{\lambda}$ is positive semidefinite matrix. $\square$
+
+
+*Remark 1*. If we considering the following linear regression model:
+
+$$
+\mathbf{Y} = \mathbf{X}\beta + \varepsilon, \, \varepsilon \sim \mathcal{N}(0,\sigma^2\mathbf{C}_{\lambda}) \text{ ,}
+$$
+
+where $\textbf{X} \in \mathbb{R}^{n \times p}$ is matrix with observations,  $\textbf{Y} \in \mathbb{R}^{n \times 1}$ is the response variable, $\beta$ is the vector with coefficients, and $\mathbf{C}_{\lambda}$ is the covariance matrix, then likelihood of the data can be expressed as:
+
+$$
+p(\mathbf{Y}|\mathbf{X},\beta) = \frac{1}{(2\pi)^{n/2}} \frac{1}{|\sigma^2 \mathbf{C}_{\lambda}|^{1/2}}
+\exp\{ -\frac{1}{2\sigma^2} (\mathbf{Y} - \mathbf{X}\beta)^\top \mathbf{C}_{\lambda}^{-1} (\mathbf{Y} - \mathbf{X}\beta) \} \text{ .}
+$$
+
+Here is where expressions such as $\mathbf{C}_{\lambda} = \lambda\Omega + (1 - \lambda)\mathbf{W}$ start singing and reveal to us something profound and interesting about the equation above. It implies that if we allow $\lambda$ to be $0$, the variability between species observations does not influence the likelihood, and only the variance of species is important. Conversely, if $\lambda$ is $1$, then the variances of between species are significant, but the within-species variability is not as crucial. This point is where the connection with linear mixed models becomes more apparent, as the random intercepts and slopes in mixed models also strive to find a balance between variations between individuals versus variations within individuals, which usually involve repeated measurements. Lynch (1991) proposed the phylogenetic version of mixed models, called the Phylogenetic Linear Mixed Model (PLMM). Historically, however, it was less popular than Felsenstein's (1985) Phylogenetic Independent Contrast (PIC), despite the fact that PIC can be seen as a special case of PLMM when there is not much variation within individuals (Garamszegi 2014), or, if we attempt to make a connection with $\lambda$, when $\lambda = 1$.
+
+### Obtaining a closed form for $\lambda$ is difficult
+
+Since we talked about maximizing, let's first define our objective function. We can obtain it from the likelihood equation:
+
+$$
+\begin{align}
+\ln p(\textbf{Y} \mid \textbf{X}, \beta )  =
+    \ln \left\{  \frac{1}{(2\pi)^{n/2}} \right\} + 
+    \ln \left\{  \frac{1}{|\sigma^2 \mathbf{C}_{\lambda}|^{1/2}} \right\} 
+    -\frac{1}{2\sigma^2} 
+    (\textbf{Y} -  \textbf{X}\beta)^\top 
+    \mathbf{C}_{\lambda}^{-1}
+    (\textbf{Y} -  \textbf{X}\beta)    \\
+ =  \ln \left\{  \frac{1}{(2\pi)^{n/2}} \right\} - \frac{n}{2}  \ln \sigma^{2} -\frac{1}{2} \ln |\mathbf{C}_{\lambda}|  -\frac{1}{2\sigma^2} 
+    (\textbf{Y} -  \textbf{X}\beta)^\top 
+    \mathbf{C}_{\lambda}^{-1}
+    (\textbf{Y} -  \textbf{X}\beta)  \\
+
+\Rightarrow \arg \max_{\beta,\lambda,\sigma^2}\,\, \ln p(\textbf{Y} \mid \textbf{X}, \beta )  = \arg \min_{\beta,\lambda,\sigma^2}\,\,  
+      n\ln \sigma^2  
+     + \ln |\mathbf{C}_{\lambda}|  
+     + \frac{1}{\sigma^2} 
+    (\textbf{Y} -  \textbf{X}\beta)^\top 
+    \mathbf{C}_{\lambda}^{-1}
+    (\textbf{Y} -  \textbf{X}\beta) \text{ .}
+\end{align}
+$$
+
+From above we can define our objective function $J(\beta,s,\mathbf{C}_{\lambda})$ as:
+
+$$
+\begin{align}
+J(\beta,s,\mathbf{C}_{\lambda}) & =     
+  n\ln \sigma^2  
+     + \ln |\mathbf{C}_{\lambda}|  
+     + \frac{1}{\sigma^2} 
+    (\textbf{Y} -  \textbf{X}\beta)^\top 
+    \mathbf{C}_{\lambda}^{-1}
+    (\textbf{Y} -  \textbf{X}\beta) \\
+& =   n\ln s
+     + \ln |\mathbf{C}_{\lambda}|  
+     + \frac{1}{s} 
+    \varepsilon^\top 
+    \mathbf{C}_{\lambda}^{-1}
+    \varepsilon
+\end{align}
+$$
+
+Recall that $\varepsilon$ is the error from our initial linear regression model, as defined in *Remark 1*, and we replaced $\sigma^2$ simply with $s$. We will use either the first or second line of the objective function definition interchangeably, depending on the variable to be differentiated.
+
+Differentiating $J(\beta,s,\mathbf{C}_{\lambda})$ with respect to $s$ and setting it to zero we have:
+
+$$
+\begin{align}
+\frac{\partial}{\partial s} J(\beta,s,\mathbf{C}_{\lambda}) & = n \frac{1}{s} - (s)^{-2}  \varepsilon^\top\mathbf{C}_{\lambda}^{-1} \varepsilon = 0 \\
+\implies s & =  \frac{1}{n} \varepsilon^\top\mathbf{C}_{\lambda}^{-1} \varepsilon
+\end{align}
+$$
+
+Now, differentiating $J(\beta,s,\mathbf{C}_{\lambda})$ with respect to $\beta$ and setting it to zero we should have the weighted least square solution:
+
+$$
+\begin{align}
+\frac{\partial}{\partial \beta} J(\beta,s,\mathbf{C}_{\lambda}) & = \frac{\partial}{\partial \beta} \left(  \frac{1}{s}(\textbf{Y} -  \textbf{X}\beta)^\top 
+    \mathbf{C}_{\lambda}^{-1}
+    (\textbf{Y} -  \textbf{X}\beta) \right) = 0  \\
+\implies \beta & = (\mathbf{X}^\top\mathbf{C}_{\lambda}^{-1}\mathbf{X})^{-1} 
+(\mathbf{X}^\top\mathbf{C}_{\lambda}^{-1}\mathbf{Y})
+\end{align}
+$$
+
+Finally, differentiating $J(\beta,s,\mathbf{C}_{\lambda})$ with respect to $\lambda$ and setting it to zero:
+
+$$
+\begin{align}
+\frac{\partial}{\partial \lambda} J(\beta,s,\mathbf{C}_{\lambda}) & = \frac{\partial}{\partial \lambda} \ln |\mathbf{C}_{\lambda}| 
+     + \frac{\partial}{\partial \lambda} 
+      \left( \varepsilon^\top\mathbf{C}_{\lambda}^{-1} \varepsilon   
+      \right)  = 0  \\
+   & \phantom{=} \mathrm{Tr} \left( \mathbf{C}_{\lambda}^{-1} \frac{\partial}{\partial \lambda} \mathbf{C}_{\lambda} \right)  
++  \frac{1}{s} 
+             \varepsilon^\top 
+              \left( \frac{\partial}{\partial \lambda} \mathbf{C}_{\lambda}^{-1}  \right)
+            \varepsilon  = 0  
+\end{align}
+$$
+
+We used the multiplication rule property for the right hand side differentiation. From here we can start seeing troubles. How can we get the $\lambda$ out of the trace or of the matrix inverse? For the sake of completeness let's finish the differentitation:
+
+$$
+\begin{align}
+\mathrm{Tr} \left( \mathbf{C}_{\lambda}^{-1} \,(\Omega - \mathbf{W}) \right)  
+           - \frac{1}{s} 
+             \varepsilon^\top 
+             \mathbf{C}_{\lambda}^{-1}
+              (\Omega - \mathbf{W})\mathbf{C}_{\lambda}^{-1}\,
+            \varepsilon & = 0 
+\end{align}
+$$
+
+For the right-hand side differentiation, we used this property: $\partial (\mathbf{A}^{-1}) = - \mathbf{A}^{-1} (\partial \mathbf{A})\mathbf{A}^{-1}$. Considering $\mathbf{C}_{\lambda}^{-1} = (\lambda\Omega + (1 - \lambda)\mathbf{W})^{-1}$, it becomes apparent that isolating $\lambda$ from the expression above is challenging. Furthermore, we have the constraint that $\lambda \geq 0$ and $\lambda \leq 1$. While multiple inequality constraints can be addressed using Lagrange multipliers followed by the Karush–Kuhn–Tucker (KKT) conditions, which look for all the active constraints that fulfill the KKT conditions (e.g., positive multipliers, feasible inequalities), this usually requires isolating $\lambda$, a task that is not trivial.
+
+### But we can use numerical optimization
+
+From above expression we could proposed the following optimization problem:
+
+$$
+\begin{align*}
+\text{minimize}   \quad & n \ln s + \ln | \textbf{C}_{\lambda} | + \frac{1}{s}\varepsilon^\top \textbf{C}_{\lambda}^{-1}\varepsilon \\
+\text{subject to} 
+\quad & \textbf{C}_{\lambda} = \lambda\Omega + (1 - \lambda)\textbf{W}\\
+\quad & \beta = (\textbf{X}^\top\textbf{C}_{\lambda}^{-1}\textbf{X})^{-1}\textbf{X}^\top\textbf{C}_{\lambda}^{-1}\textbf{y}\\
+\quad & \varepsilon = \textbf{Y} - \textbf{X}\beta\\
+\quad & s = \frac{1}{n}\varepsilon^\top \textbf{C}_{\lambda}^{-1}\varepsilon \\
+\quad & \lambda \geq 0\\
+\quad & \lambda \leq 1\\
+\end{align*}
+$$
+
+where $\lambda$ is the unique decision variable. 
+
+Making the functions:
+
+```python
+from scipy.optimize import minimize
+import numpy as np
+
+def objective_function(X, y, Sigma, lambda_val):
+    W = np.diag( np.diag(Sigma) )
+    C = lambda_val * Sigma + (1 - lambda_val) * W
+
+    C_inv = np.linalg.inv(C)
+    beta  = np.linalg.inv(X.T @ C_inv @ X) @ (X.T @ C_inv @ y)
+    e = y - X @ beta 
+    s = (1/n)*e.T @ C_inv @ e
+
+    objective = n*np.log(s) + np.log(np.linalg.det(C)) + (1/s)*e.T@ C_inv @e
+    return objective.astype(np.float64)[0][0]
+
+def optimize_problem(X, y, Sigma):
+    n, p = X.shape
+    X = np.hstack((np.ones((n, 1)), X))
+
+    # Define the bounds for lambda
+    bounds = [(0, 1)]
+
+    # Initial guess for lambda 
+    initial_lambda = np.random.uniform(0, 1)
+
+    # Define the optimization problem
+    fnc = lambda lambda_val: objective_function(X, y, Sigma, lambda_val)
+    result = minimize(fnc, x0 = initial_lambda, bounds=bounds, method='SLSQP')
+
+    return result
+```
+
+Testing two trees:
+
+```python
+np.random.seed(123)
+n = 5
+# tree 1
+C1 = np.array([[7,0,0,0,0],
+               [0,7,6,4,4],
+               [0,6,7,4,4],
+               [0,4,4,7,6],
+               [0,4,4,6,7]])
+X1 = np.random.multivariate_normal(mean = [0]*n, cov = C1, size = 2).T
+y1 = np.random.multivariate_normal(mean = [0]*n, cov = C1, size = 1).T
+print(optimize_problem(X1, y1, C1).x[0]) # 1.0
+
+# tree 2
+C2 = np.array([[7, 0, 0, 0, 0],
+               [0, 7, 1,.5,.5],
+               [0, 1, 7,.5,.5],
+               [0,.5,.5, 7, 1],
+               [0,.5,.5, 1, 7]])
+X2 = np.random.multivariate_normal(mean = [0]*n, cov = C2, size = 2).T
+y2 = np.random.multivariate_normal(mean = [0]*n, cov = C2, size = 1).T
+print(optimize_problem(X2, y2, C2).x[0]) # 0.0
+```
+
+
+
+
+# References
+
+* Garamszegi, L. Z. (Ed.). (2014). _Modern phylogenetic comparative methods and their application in evolutionary biology: concepts and practice_. Springer.
+
+* Housworth, E. A., Martins, E. P., & Lynch, M. (2004). The phylogenetic mixed model. The American Naturalist, 163(1), 84-96.
+
+* Lynch, M. (1991). Methods for the analysis of comparative data in evolutionary biology. Evolution, 45(5), 1065-1080.
+
+* Felsenstein, J. (1985). Phylogenies and the comparative method. The American Naturalist, 125(1), 1-15.
