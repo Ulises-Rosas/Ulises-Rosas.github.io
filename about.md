@@ -4,7 +4,7 @@ permalink: /about/
 ---
 
 
-Ph.D. student in Ecology & Evolutionary Biology\\
+Ph.D. candidate in Ecology & Evolutionary Biology\\
 University of Oklahoma
 
 M.Sc. in Biology\\

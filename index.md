@@ -9,7 +9,5 @@ header:
   overlay_image: /assets/icon.png
   overlay_filter: rgba(28, 146, 202, 0.5)
 ---
-This is Ulises and I'm interested in the evolutionary biology of marine
-organisms. This interest has pushed me to spent most of my time developing/using
-bioinformatic tools to answer questions in evolutionary biology and ecology. This
-homepage is designed to ocassionally post some thoughts on code, fish and evolution
+This is Ulises and I'm interested in the evolutionary biology of marine organisms and statistics. This interest has pushed me to spent most of my time developing/using bioinformatic tools to answer questions in evolutionary biology and ecology. This homepage is designed to ocassionally post some thoughts on code, fish and evolution.
+
