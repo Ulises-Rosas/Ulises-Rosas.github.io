@@ -6,7 +6,7 @@ date:   2024-01-15
 categories: jekyll update
 excerpt: "A fun connection"
 header:
-  overlay_image: /assets/NW_attention.pdf
+  overlay_image: /assets/NW_attention.jpg
   overlay_filter: 0.59
 ---
 
