@@ -229,7 +229,7 @@ y_{n}
 \end{align}
 $$
 
-if we replace the constant $1/2\sigma^2$  with another constant, $1/\sqrt{d_{k}}$​, where $d_{k}$​ represents the dimension of the instance vector (in our case, simply $p$), it becomes more apparent that the predictions of Nadaraya-Watson transform into the equation of the attention mechanism when the function $s$ is utilized as a similarity function.
+if we replace the constant $1/2\sigma^2$  with another constant, $1/\sqrt{d_{k}}$​, where $d_{k}$​ represents the dimension of the instance vector (in our case, simply $p$), it becomes more apparent that the predictions of Nadaraya-Watson turns into the equation of the attention mechanism when the function $s$ is utilized as a similarity function:
 
 $$
 \begin{align}
@@ -245,12 +245,12 @@ f(\mu_{t})
 \end{align}
 $$
  
-In the context of neural networks, the elements of the matrices $$\mathbf{W}_{q}$$ and $$\mathbf{W}_{k}$$ are part of the [Transformers architecture](https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf) and they learned via gradient descent.
+In the context of deep neural networks, the elements of the matrices $$\mathbf{W}_{q}$$ and $$\mathbf{W}_{k}$$ are part of the [Transformers architecture](https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf) and they are learned via gradient descent.
 
-This fun connection adds to the idea that for understanding how neural networks work we should also aim to understand kernel machines better (2). Perhaps, we are getting closer to the master algorithm that unites all the tribes of the machine learning community (3)
+This intriguing connection contributes to the notion that a deeper understanding of kernel machines is crucial for comprehending how neural networks function (2). Perhaps, we are getting closer to the 'master algorithm' that unifies all factions within the machine learning community (3).
 
 # References
 
 1. Carroll, S. (2022). _The biggest ideas in the universe: Space, time, and motion_. Penguin.
-2. Domingos, P. (2015). _The master algorithm: How the quest for the ultimate learning machine will remake our world_. Basic Books.
-3. Domingos, P. (2020). Every model learned by gradient descent is approximately a kernel machine. _arXiv preprint arXiv:2012.00152_.
+2. Domingos, P. (2020). Every model learned by gradient descent is approximately a kernel machine. _arXiv preprint arXiv:2012.00152_.
+3. Domingos, P. (2015). _The master algorithm: How the quest for the ultimate learning machine will remake our world_. Basic Books.
