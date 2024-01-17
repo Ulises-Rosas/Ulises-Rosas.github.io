@@ -66,9 +66,7 @@ $$
 \end{align}
 $$
 
-Since $\mathbf{u}^\top\textbf{C}_{\lambda} \mathbf{u} \geq 0$ for any $\mathbf{u} \neq 0$, then 
-
-$\textbf{C}_{\lambda}$ is positive semidefinite matrix. $\square$
+Since $\mathbf{u}^\top\textbf{C}_{\lambda} \mathbf{u} \geq 0$ for any $\mathbf{u} \neq 0$, then $$\textbf{C}_{\lambda}$$ is positive semidefinite matrix. $\,\,\square$
 
 
 *Remark 1*. If we considering the following linear regression model:

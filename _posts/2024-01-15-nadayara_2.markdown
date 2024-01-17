@@ -30,7 +30,7 @@ $$
 
 whose solution yields the Einstein field equations, revealing the relationship of the geometry of spacetime with matter distribution (1), a key insight for the general theory of relativity.
 
-In the case obtained equation from the previous blog, something deeper is going on, as relatively recently showed in an article by [Utkin & Konstantinov 2022](https://arxiv.org/abs/2201.02880). Consider the prediction for the instance $\mu_{1}$ of the testing set:
+In the case obtained equation from the previous blog, something deeper is going on, as relatively recently showed in an article by [Utkin & Konstantinov 2022](https://arxiv.org/abs/2201.02880)(2). Consider the prediction for the instance $\mu_{1}$ of the testing set:
 
 $$
 \begin{align}
@@ -100,7 +100,7 @@ s(\mathbf{x}_i, \mathbf{\mu}_1)\}
 \end{align}
 $$
 
-In the penultimate line, in the exponent of the denominator, we obtain the negative of the l2-norm distance between the training instance $$\mathbf{x}_c$$ and the testing instance $\mathbf{\mu}_{1}$ multiplied by a constant. This negative of the l2-norm distance can also be seen as a function $s: \mathbb{R}^p \to \mathbb{R}$ that measures the similarity, as they are inversely proportional. This transformation can also be applied to the numerator.
+In the penultimate line, in the exponent of the denominator, we obtain the negative of the $\ell^2$-norm distance between the training instance $$\mathbf{x}_c$$ and the testing instance $\mathbf{\mu}_{1}$ multiplied by a constant. This negative of the $\ell^2$-norm distance can also be seen as a function $s: \mathbb{R}^p \to \mathbb{R}$ that measures the similarity, as they are inversely proportional. This transformation can also be applied to the numerator.
 
 Plugging the above result in the rest of the vector in the prediction of the instance $\mu_{1}$:
 
@@ -245,12 +245,14 @@ f(\mu_{t})
 \end{align}
 $$
  
-In the context of deep neural networks, the elements of the matrices $$\mathbf{W}_{q}$$ and $$\mathbf{W}_{k}$$ are part of the [Transformers architecture](https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf) and they are learned via gradient descent.
+In the context of deep neural networks, the elements of the matrices $$\mathbf{W}_{q}$$ and $$\mathbf{W}_{k}$$ are part of the [Transformer architecture](https://proceedings.neurips.cc/paper_files/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf)(3) and they are learned via gradient descent.
 
-This intriguing connection contributes to the notion that a deeper understanding of kernel machines is crucial for comprehending how neural networks function (2). Perhaps, we are getting closer to the 'master algorithm' that unifies all factions within the machine learning community (3).
+This intriguing connection contributes to the notion that a deeper understanding of kernel machines is crucial for comprehending how neural networks function (4). Perhaps, we are getting closer to the 'master algorithm' that unifies all factions within the machine learning community (5).
 
 # References
 
 1. Carroll, S. (2022). _The biggest ideas in the universe: Space, time, and motion_. Penguin.
-2. Domingos, P. (2020). Every model learned by gradient descent is approximately a kernel machine. _arXiv preprint arXiv:2012.00152_.
-3. Domingos, P. (2015). _The master algorithm: How the quest for the ultimate learning machine will remake our world_. Basic Books.
+2. Utkin, L. V., & Konstantinov, A. V. (2022). Attention-based random forest and contamination model. Neural Networks, 154, 346-359.
+3. Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., ... & Polosukhin, I. (2017). Attention is all you need. Advances in neural information processing systems, 30.
+4. Domingos, P. (2020). Every model learned by gradient descent is approximately a kernel machine. _arXiv preprint arXiv:2012.00152_.
+5. Domingos, P. (2015). _The master algorithm: How the quest for the ultimate learning machine will remake our world_. Basic Books.
