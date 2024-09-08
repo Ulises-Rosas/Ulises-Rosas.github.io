@@ -90,7 +90,7 @@ f(\textbf{x}_{i}| \theta) = \sum_{x_0} \pi_{x_0} \left\{
 \end{equation}
 $$
 
-Above factorization  is analogous to the factorization of $$ x^2 + x $$ into $$ x(x + 1) $$. It might not be apparent at the first sight, but above summation follows the (recursive) shape of the tree. This is the Felsenstein prunning algorithm.
+Above factorization  is analogous to the factorization of $$ x^2 + x $$ into $$ x(x + 1) $$. It might not be apparent at the first sight, but above summation follows the (recursive) shape of the tree. This is the Felsenstein prunning algorithm, which is essentially a [recursive algorithm](https://en.wikipedia.org/wiki/Recursion_(computer_science)).
 
 ## Transition probability matrix
 
@@ -171,7 +171,7 @@ $$
 \end{equation}
 $$
 
-Then, we can approximate $$ \textbf{p}(t) $$ with the exponential of the matrix:
+Then, we can approximate $$ \textbf{p}(t) $$ with the following expansion of the exponential of a matrix:
 
 $$
 \begin{equation}
@@ -180,10 +180,16 @@ $$
 \end{equation}
 $$
 
-Observations: i) $$ \textbf{p}(t) $$ is in function of time and the initial value $$\textbf{Q} $$, ii)  $$\textbf{Q} $$ contains information of the evolutionary model, iii) while above summation converges into a specific matrix in function of the number of terms considered, eigenvalue decomposition could have also been used.
+Observations: i) $$ \textbf{p}(t) $$ is in function of time and the initial value $$\textbf{Q} $$, ii)  $$\textbf{Q} $$ contains information of the evolutionary model, iii) while above summation converges into a specific matrix in function of the number of terms considered, spectral decomposition could also be used when the matrix $\mathbf{Q}$ is positive semidefinite, a property seen in time-reversible Markov processes:
 
 
+$$
+\begin{equation}
+\textbf{p}(t) = e^{ \textbf{Q}t } =  \mathbf{U}e^{\mathbf{\Lambda}t} \mathbf{U}^{-1}
+\end{equation}
+$$
 
+where $\mathbf{U}$ and $\mathbf{\Lambda}$ are the matrices of eigenvectors and eigenvalues, respectively. For instance, in models such as GTR, where $\mathbf{Q}$ is not necessarily symmetric, spectral decomposition remains applicable because $\mathbf{Q}$ can be expressed as the product of two symmetric matrices (Felsenstein 2004, pp. 206; Zhang 2014, pp. 67). For non-time-reversible Markov processes, an algorithm called *scale and squaring*, which is based on the first two terms of the expansion of $$  e^{ \textbf{Q}t } $$, is preferred (Zhang 2014, pp. 66).
 
 <div class="warning" style='background-color:#E9D8FD; color: #69337A; border-left: solid #805AD5 4px; border-radius: 4px; padding:0.7em;'>
 <span>
@@ -293,10 +299,12 @@ $$L_{7}(G) = P_{GT}(0.2) \times P_{GC}(0.2) = 0.045 \times 0.045 = 0.002$$
 But, this can also be re-written as:
 
 $$
-L_{7} = \begin{bmatrix} 0.069 & 0.069 & 0.002 & 0.002 \end{bmatrix} =\\ 
-		\begin{bmatrix} 0.825 & 0.084 & 0.045 & 0.045 \end{bmatrix}  \odot
-		\begin{bmatrix} 0.084 & 0.825 & 0.045 & 0.045 \end{bmatrix} =\\
-		X  \odot Y
+\begin{align}
+L_{7} & = \begin{bmatrix} 0.069 & 0.069 & 0.002 & 0.002 \end{bmatrix} \\
+& = \begin{bmatrix} 0.825 & 0.084 & 0.045 & 0.045 \end{bmatrix}  \odot
+		\begin{bmatrix} 0.084 & 0.825 & 0.045 & 0.045 \end{bmatrix}\\
+& = X  \odot Y
+\end{align}
 $$
 
 In turn, $$X$$ and $$Y$$ can be re-written as:
@@ -467,8 +475,22 @@ print(tree)
       'parent': 0}}
 ```
 
+Finally, the likelihood of a particular tree is given by the probability vector for the root (i.e., `tree[0]['data']` above), multiplied by the equilibrium distribution $\pi$, which is 1/4 in both the K2P and JC models:
 
-References:
+$$
+\begin{equation}
+f(\textbf{x}_{i}| \theta) = \sum_{x_{0}} \pi_{x_0}L_0(x_0)
+\end{equation}
+$$
+
+This can be simply implemented in code as:
+
+```python
+sum(0.25 * tree[0]['data'])
+# Likelihood: 0.0005098430765880512
+```
+
+# References
 
 1. Yang, Z. (2014). Molecular evolution: a statistical approach. Oxford University Press.
 2. Felenstein, J. (2004). Inferring phylogenies. Sunderland, MA: Sinauer associates.
