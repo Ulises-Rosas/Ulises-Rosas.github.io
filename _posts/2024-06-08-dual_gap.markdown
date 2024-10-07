@@ -15,21 +15,21 @@ We can define the Lasso primal objective function as:
 
 $$
 \begin{align}
-\frac{1}{2n}\lVert \mathbf{y} - \mathbf{X}\beta \rVert_2^2 + \lambda \lVert \beta \rVert_1
+\frac{1}{2n}\lVert \mathbf{y} - \mathbf{X}\beta \rVert_2^2 + \lambda \lVert \beta \rVert_1 \text{ .}
 \end{align}
 $$
 
-Its corresponding dual objective function is:
+Lasso is a convex function and its corresponding dual objective function is:
 
 $$
 \begin{align*}
 \text{maximize} \quad & \frac{1}{2n} \lVert \mathbf{y} \rVert_2^2
 - \frac{1}{2n} \lVert \mathbf{y} - n\mathbf{\Lambda} \rVert_2^2 \\
-\text{subject to} \quad & \lvert (\mathbf{\Lambda}^{\top}\mathbf{X})_j \rvert \leq \lambda \quad \forall j
+\text{subject to} \quad & \lvert (\mathbf{\Lambda}^{\top}\mathbf{X})_j \rvert \leq \lambda \quad \forall j \text{ ,}
 \end{align*}
 $$
 
-Notice that for the constraint, we can apply the definition of the infinity norm as $$\lambda \geq \lvert (\mathbf{\Lambda}^{\top}\mathbf{X})_j  \rvert$$ for *all* $j$. This also implies that $$\lambda \geq \max \lvert (\mathbf{\Lambda}^{\top}\mathbf{X})_j  \rvert$$ for *some* $j$. The right-hand side of the inequality is precisely the definition of the infinity norm (i.e., $\lVert \mathbf{\Lambda}^{\top}\mathbf{X} \rVert_{\infty}$). 
+Where $$\mathbf{\Lambda} \in \mathbb{R}^n$$ is the column vector containing the dual variables. Notice that for the constraint, we can apply the definition of the infinity norm as $$\lambda \geq \lvert (\mathbf{\Lambda}^{\top}\mathbf{X})_j  \rvert$$ for *all* $j$. This also implies that $$\lambda \geq \max \lvert (\mathbf{\Lambda}^{\top}\mathbf{X})_j  \rvert$$ for *some* $j$. The right-hand side of the later inequality is precisely the definition of the infinity norm (i.e., $\lVert \mathbf{\Lambda}^{\top}\mathbf{X} \rVert_{\infty}$). 
 
 Here I will explain step by step how to derive this dual. The gap between the objective function values of the primal and dual formulations is known as the duality gap. Theoretically, this gap should be zero, but achieving this may take a long time. Then, a sufficiently accurate solution can be obtained when this gap is small enough. Once the duality gap falls below a certain user-defined threshold, the coordinate descent iterations solving the Lasso primal objective function can be stopped.
 
@@ -273,7 +273,7 @@ Finally, as mentioned in the last sentence of the "The $T_1$ solution" section, 
 
 $$
 \begin{align*}
-\mathbf{\Lambda}^t = \frac{1}{n} \mathbf{R}^t
+\mathbf{\Lambda}^t = \frac{1}{n} \mathbf{R}^t \text{ .}
 \end{align*}
 $$
 
