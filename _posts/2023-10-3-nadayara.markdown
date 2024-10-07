@@ -10,7 +10,7 @@ excerpt: "In progress"
 
 I found this [cool post](https://towardsdatascience.com/regularized-kernel-regression-from-a-variational-principle-d2b0c03eb919) and I thought it could be fun to implement the solution as well as go over my own understanding of the derived equations. 
 
-In machine learning methods we minimize the following loss function:
+In machine learning models we typically minimize the following loss function:
 
 $$
 \text{arg min}_{f} \sum_{i = 1}^{n} \{ f(x_i) - y_i  \}^2
