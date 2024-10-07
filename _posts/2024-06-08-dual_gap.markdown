@@ -1,0 +1,368 @@
+---
+layout: archive
+classes: wide
+title: The dual of Lasso
+date:   2024-06-08
+categories: jekyll update
+excerpt: "Python code included"
+header:
+  overlay_image: /assets/hastie_tibs.jpg
+  overlay_filter: 0.5
+  caption: "Photo credit: [**Youtube course**](https://www.youtube.com/watch?v=9vlDVxG4ulA)"
+---
+
+We can define the Lasso primal objective function as:
+
+$$
+\begin{align}
+\frac{1}{2n}\lVert \mathbf{y} - \mathbf{X}\beta \rVert_2^2 + \lambda \lVert \beta \rVert_1
+\end{align}
+$$
+
+Its corresponding dual objective function is:
+
+$$
+\begin{align*}
+\text{maximize} \quad & \frac{1}{2n} \lVert \mathbf{y} \rVert_2^2
+- \frac{1}{2n} \lVert \mathbf{y} - n\mathbf{\Lambda} \rVert_2^2 \\
+\text{subject to} \quad & \lvert (\mathbf{\Lambda}^{\top}\mathbf{X})_j \rvert \leq \lambda \quad \forall j
+\end{align*}
+$$
+
+Notice that for the constraint, we can apply the definition of the infinity norm as $$\lambda \geq \lvert (\mathbf{\Lambda}^{\top}\mathbf{X})_j  \rvert$$ for *all* $j$. This also implies that $$\lambda \geq \max \lvert (\mathbf{\Lambda}^{\top}\mathbf{X})_j  \rvert$$ for *some* $j$. The right-hand side of the inequality is precisely the definition of the infinity norm (i.e., $\lVert \mathbf{\Lambda}^{\top}\mathbf{X} \rVert_{\infty}$). 
+
+Here I will explain step by step how to derive this dual. The gap between the objective function values of the primal and dual formulations is known as the duality gap. Theoretically, this gap should be zero, but achieving this may take a long time. Then, a sufficiently accurate solution can be obtained when this gap is small enough. Once the duality gap falls below a certain user-defined threshold, the coordinate descent iterations solving the Lasso primal objective function can be stopped.
+
+
+## The art of variable change
+
+Starting from the primal objective function, let $\mathbf{z} = \mathbf{X}\beta$, allowing us to define the following "new" objective function:
+
+$$
+\begin{align*}
+\text{minimize} \quad & \frac{1}{2n}\lVert \mathbf{y} - \mathbf{z} \rVert_2^2 + \lambda \lVert \beta \rVert_1 \\
+\text{subject to} \quad & \mathbf{z} = \mathbf{X}\beta
+\end{align*}
+$$
+
+We now form the Lagrangian function using the multiplier vector $\mathbf{\Lambda} \in \mathbb{R}^{n \times 1}$:
+
+$$
+\begin{align*}
+\mathcal{L} &= \frac{1}{2n}\lVert \mathbf{y} - \mathbf{z} \rVert_2^2 + \lambda \lVert \beta \rVert_1 
++ \mathbf{\Lambda}^{\top}(\mathbf{z} - \mathbf{X}\beta)\\
+&= \underbrace{\frac{1}{2n}\lVert \mathbf{y} - \mathbf{z} \rVert_2^2 + \mathbf{\Lambda}^{\top}\mathbf{z}}_{T_1} +
+\underbrace{\lambda \lVert \beta \rVert_1 - \mathbf{\Lambda}^{\top}\mathbf{X}\beta}_{T_2}
+\end{align*}
+$$
+
+In the expression above, we minimize $T_1$ with respect to $\mathbf{z}$ and $T_2$ with respect to $\beta$. Minimizing $T_1$ is straightforward, as it involves a quadratic term. For $T_2$, there are two approaches: a longer one and a shorter one. The shorter approach uses convex conjugate rules, which I will omit here. Instead, I will follow the longer approach, which makes more sense to me at the moment. 
+
+The main goal of the Lagrangian is to express everything in terms of $\mathbf{\Lambda}$. Once we achieve this, we will obtain our dual objective function.
+
+## The $T_1$ solution
+
+We can expand the quadratic expression as follows:
+
+$$
+\begin{align*}
+T_1 = \frac{1}{2n}(\mathbf{y}^{\top}\mathbf{y} - 2\mathbf{z}^{\top}\mathbf{y} + \mathbf{z}^{\top}\mathbf{z}) + \mathbf{\Lambda}^{\top}\mathbf{z}
+\end{align*}
+$$
+
+Next, differentiating $T_1$ with respect to $\mathbf{z}$ and setting it to zero, we obtain:
+
+$$
+\begin{align*}
+\frac{\partial}{\partial \mathbf{z}} T_1 &= \frac{1}{2n}(-2\mathbf{y} + 2\mathbf{z}) + \mathbf{\Lambda} = 0 \\
+\implies \mathbf{z} &= \mathbf{y} - n\mathbf{\Lambda}
+\end{align*}
+$$
+
+With some rearrangement, we also find that $\mathbf{\Lambda} = \frac{1}{n}(\mathbf{y} - \mathbf{z}) = \frac{1}{n} \mathbf{R}$, where $\mathbf{R}$ is the vector of residuals. This result will be useful later.
+## The $T_2$ solution
+
+To differentiate $T_2$ with respect to $\beta$, we can differentiate it coordinate-wise:
+
+$$
+\begin{align*}
+\frac{\partial }{\partial \mathbf{\beta}} T_2 = \begin{bmatrix} 
+\frac{\partial }{\partial \beta_1} T_{2,1}\\
+\vdots\\
+\frac{\partial }{\partial \beta_j} T_{2,j}\\
+\vdots\\
+\frac{\partial }{\partial \beta_p} T_{2,p}
+\end{bmatrix}
+\end{align*}
+$$
+
+Differentiating $T_{2,j}$ with respect to $\beta_j$ and setting it to zero, we get:
+
+$$
+\begin{align*}
+\frac{\partial }{\partial \beta_j} T_{2,j} &= 
+\frac{\partial}{\partial \beta_j} \left\{
+\lambda \lvert \beta_j \rvert - (\mathbf{\Lambda}^{\top}\mathbf{X})_j\beta_j
+\right\} = 0 \\
+\implies \lambda s_j &= (\mathbf{\Lambda}^{\top}\mathbf{X})_j
+\end{align*}
+$$
+
+Where $s_j$ is the subgradient for the coordinate $\beta_j$:
+
+$$
+\begin{equation*}
+  s_j = \begin{cases}
+                     +1,  & \text{if $\beta_j > 0$}\\
+                     -1,  & \text{if $\beta_j < 0$}\\
+                 (-1,+1), & \text{if $\beta_j  = 0$}
+  \end{cases} \, 
+\end{equation*}
+$$
+
+From the above definition, we can deduce the following:
+
+$$
+\begin{align}
+-1 & \leq s_j \leq 1 \\
+-\lambda & \leq \lambda s_j \leq \lambda \\
+-\lambda & \leq (\mathbf{\Lambda}^{\top}\mathbf{X})_j \leq \lambda
+\end{align}
+$$
+
+Since $$\lambda \geq (\mathbf{\Lambda}^{\top}\mathbf{X})_j$$ and $$\lambda \geq -(\mathbf{\Lambda}^{\top}\mathbf{X})_j$$, we have $$\lambda \geq \lvert (\mathbf{\Lambda}^{\top}\mathbf{X})_j  \rvert$$. Now, we aim to derive a lower bound for $T_{2,j}$ based on this inequality for $\lambda$:
+
+$$
+\begin{align}
+\lambda & \geq \lvert (\mathbf{\Lambda}^{\top}\mathbf{X})_j  \rvert \\
+\lambda - (\mathbf{\Lambda}^{\top}\mathbf{X})_j s_j & \geq \lvert (\mathbf{\Lambda}^{\top}\mathbf{X})_j  \rvert - (\mathbf{\Lambda}^{\top}\mathbf{X})_j s_j \\
+\underbrace{\left\{\lambda - (\mathbf{\Lambda}^{\top}\mathbf{X})_j s_j\right\}\lvert \beta_j \rvert}_{T_{2,j}}
+ & \geq 
+\left\{\lvert (\mathbf{\Lambda}^{\top}\mathbf{X})_j  \rvert - (\mathbf{\Lambda}^{\top}\mathbf{X})_j s_j\right\}
+\lvert \beta_j \rvert   \geq 0 \\
+T_{2,j} & \geq 0 \\
+\implies \min T_{2,j} &= 0
+\end{align}
+$$
+
+In the case where $\lambda < \lvert (\mathbf{\Lambda}^{\top}\mathbf{X})_j  \rvert$, we have the opposite direction of the inequality:
+
+$$
+\begin{align}
+T_{2,j} & < 0 \\
+\implies \min T_{2,j} &= -\infty
+\end{align}
+$$
+
+Thus, we get the lower bound of $-\infty$ as $\beta_j$ can take arbitrarily large values. From both results, we conclude the following two cases:
+
+$$
+\begin{equation*}
+  \min T_{2,j} = \begin{cases}
+	 0,        & \text{if $\lambda \geq \lvert (\mathbf{\Lambda}^{\top}\mathbf{X})_j  \rvert$}\\
+	 -\infty,  & \text{if $\lambda < \lvert (\mathbf{\Lambda}^{\top}\mathbf{X})_j  \rvert$}
+  \end{cases} \, 
+\end{equation*}
+$$
+
+One of these two cases clearly gives us a feasible and more useful lower bound. Choose wisely!
+
+## Taken everything together
+
+Now we are ready to substitute the value of $\mathbf{z}$ and the condition for $T_{2,j}$ into our initial Lagrangian function. Let us start with $T_1$, and apply some linear al-Jabr:
+
+$$
+\begin{align}
+T_{1} &= \frac{1}{2n}\lVert \mathbf{y} - \mathbf{z} \rVert_2^2 + \mathbf{\Lambda}^{\top}\mathbf{z} \\
+      &= \frac{1}{2n}\lVert \mathbf{y} - (\mathbf{y} - n \mathbf{\Lambda}) \rVert_2^2 + \mathbf{\Lambda}^{\top}(\mathbf{y} - n \mathbf{\Lambda}) \\
+      &= \frac{1}{2} n \mathbf{\Lambda}^{\top}\mathbf{\Lambda} + \mathbf{\Lambda}^{\top}\mathbf{y} - n\mathbf{\Lambda}^{\top} \mathbf{\Lambda} \\
+      &= -\frac{n}{2}\mathbf{\Lambda}^{\top}\mathbf{\Lambda} + \mathbf{\Lambda}^{\top}\mathbf{y} \\
+      &= -\frac{1}{2n}( n^2 \mathbf{\Lambda}^{\top}\mathbf{\Lambda} - 2n \mathbf{\Lambda}^{\top}\mathbf{y}) \\
+      &= -\frac{1}{2n}( n^2 \mathbf{\Lambda}^{\top}\mathbf{\Lambda} - 2n \mathbf{\Lambda}^{\top}\mathbf{y} + \mathbf{y}^{\top}\mathbf{y} - \mathbf{y}^{\top}\mathbf{y}) \\
+      &= -\frac{1}{2n}( \lVert \mathbf{y} - n\mathbf{\Lambda} \rVert_2^2 - \lVert \mathbf{y} \rVert_2^2 ) \\
+      &= \frac{1}{2n} \lVert \mathbf{y} \rVert_2^2 - \frac{1}{2n} \lVert \mathbf{y} - n\mathbf{\Lambda} \rVert_2^2
+\end{align}
+$$
+
+Thus, we can construct our Lagrangian as:
+
+$$
+\begin{align*}
+\text{maximize} \quad & \frac{1}{2n} \lVert \mathbf{y} \rVert_2^2 - \frac{1}{2n} \lVert \mathbf{y} - n\mathbf{\Lambda} \rVert_2^2 \\
+\text{subject to} \quad & \lvert (\mathbf{\Lambda}^{\top}\mathbf{X})_j \rvert \leq \lambda \quad \forall j
+\end{align*}
+$$
+
+This is the dual objective function of the Lasso problem. By conveniently rearranging the constraint, we get the equivalent function:
+
+$$
+\begin{align*}
+\text{maximize} \quad & \frac{1}{2n} \lVert \mathbf{y} \rVert_2^2 - \frac{1}{2n} \lVert \mathbf{y} - n\mathbf{\Lambda} \rVert_2^2 \\
+\text{subject to} \quad & \frac{1}{\lambda} \lvert (\mathbf{X}^{\top}\mathbf{\Lambda})_j \rvert \leq 1 \quad \forall j
+\end{align*}
+$$
+
+Now, let’s take a step further and 'eliminate' the constraint using some clever rescaling (Massias, 2018). Let $\mathbf{\Lambda}^t$ be the dual variable at iteration $t$ of the coordinate descent algorithm, and let $\theta^t$ be the rescaled version of this dual variable defined as:
+
+$$
+\begin{align*}
+\theta^t = \frac{\mathbf{\Lambda}^t}{\max \left\{ \lambda, \underset{j}{\max} \lvert (\mathbf{X}^{\top}\mathbf{\Lambda}^t)_j \rvert \right\}}
+\end{align*}
+$$
+
+This rescaling transforms the dual into:
+
+$$
+\begin{align*}
+\text{maximize} \quad & \frac{1}{2n} \lVert \mathbf{y} \rVert_2^2 - \frac{1}{2n} \lVert \mathbf{y} - n\lambda \theta^t \rVert_2^2 \\
+\text{subject to} \quad & \frac{1}{\lambda} \lvert (\mathbf{X}^{\top}\theta^t)_j \rvert \leq 1 \quad \forall j
+\end{align*}
+$$
+
+For the $k$-th constraint, we have:
+
+$$
+\begin{align*}
+\frac{1}{\max \left\{ \lambda, \underset{j}{\max} \lvert (\mathbf{X}^{\top}\mathbf{\Lambda}^t)_j \rvert \right\}} \lvert (\mathbf{X}^{\top}\mathbf{\Lambda}^t)_k \rvert \leq 1
+\end{align*}
+$$
+
+Let’s see how this rescaling affects the constraint. There are only two cases. If $\lambda \geq \underset{j}{\max} \lvert (\mathbf{X}^{\top}\mathbf{\Lambda}^t)_j \rvert$, we have the following constraint:
+
+$$
+\begin{align*}
+\frac{1}{\lambda} \leq \frac{1}{\underset{j}{\max} \lvert (\mathbf{X}^{\top}\mathbf{\Lambda}^t)_j \rvert} \\
+\frac{1}{\lambda} \lvert (\mathbf{X}^{\top}\mathbf{\Lambda}^t)_k \rvert \leq \frac{\lvert (\mathbf{X}^{\top}\mathbf{\Lambda}^t)_k \rvert}{\underset{j}{\max} \lvert (\mathbf{X}^{\top}\mathbf{\Lambda}^t)_j \rvert} & \leq 1 \\
+\implies \frac{1}{\lambda} \lvert (\mathbf{X}^{\top}\mathbf{\Lambda}^t)_k \rvert \leq 1
+\end{align*}
+$$
+
+This constraint is satisfied with the rescaling. Hence, there is no need for the constraint in the dual function after rescaling:
+
+$$
+\begin{align*}
+\text{maximize} \quad & \frac{1}{2n} \lVert \mathbf{y} \rVert_2^2 - \frac{1}{2n} \lVert \mathbf{y} - n\mathbf{\Lambda}^t \rVert_2^2
+\end{align*}
+$$
+
+This is also true when we reach convergence. If $\lambda < \underset{j}{\max} \lvert (\mathbf{X}^{\top}\mathbf{\Lambda}^t)_j \rvert$, the constraint becomes:
+
+$$
+\begin{align*}
+\frac{1}{\underset{j}{\max} \lvert (\mathbf{X}^{\top}\mathbf{\Lambda}^t)_j \rvert} \lvert (\mathbf{X}^{\top}\mathbf{\Lambda}^t)_k \rvert \leq 1
+\end{align*}
+$$
+
+This is also satisfied with the rescaling. In this case, the dual function becomes:
+
+$$
+\begin{align*}
+\text{maximize} \quad & \frac{1}{2n} \lVert \mathbf{y} \rVert_2^2 - \frac{1}{2n} \lVert \mathbf{y} - n\lambda \frac{\mathbf{\Lambda}^t}{\underset{j}{\max} \lvert (\mathbf{X}^{\top}\mathbf{\Lambda}^t)_j \rvert} \rVert_2^2
+\end{align*}
+$$
+
+This is the case when the dual variable has not yet converged. In both cases, the constraint is unnecessary, and the dual function can simply be defined as:
+
+$$
+\begin{align*}
+\text{maximize} \quad & \frac{1}{2n} \lVert \mathbf{y} \rVert_2^2 - \frac{1}{2n} \lVert \mathbf{y} - n\lambda\theta^t \rVert_2^2
+\end{align*}
+$$
+
+Finally, as mentioned in the last sentence of the "The $T_1$ solution" section, we have the relationship between the dual variable and the residuals. To implement the dual gap fully, we need this relationship again:
+
+$$
+\begin{align*}
+\mathbf{\Lambda}^t = \frac{1}{n} \mathbf{R}^t
+\end{align*}
+$$
+
+
+
+## Python implementation
+
+The following code corresponds to the dual gap estimation, which is simply the difference between the primal and dual functions. To validate the equations derived above, we can use the dual gap implementation from `scikit-learn` and compare it with a custom dual gap implementation from scratch. The code is adapted from the `scikit-learn` [GitHub page](https://github.com/scikit-learn/scikit-learn/issues/19160), which applies the equations we derived above:
+
+```python
+import numpy as np
+from numpy.linalg import norm
+from sklearn import linear_model
+
+np.random.seed(12038)
+
+X = np.random.randn(100, 200)
+y = np.random.randn(100)
+n = len(y)
+
+alpha_max = norm(X.T @ y, ord=np.inf) / len(y)
+alpha = alpha_max/20
+
+clf2 = linear_model.Lasso(fit_intercept=False, alpha=alpha).fit(X, y)
+
+# Lasso coefficients
+w = clf2.coef_
+
+# Residuals
+R = y - X @ w
+
+# constant
+c1 = 1/(2*n)
+
+# Lasso primal value
+p_obj =c1 * (norm(R) ** 2 ) + alpha * norm(w, ord=1)
+
+# Lambda^t
+Lt = R/n
+# theta^t
+theta = Lt/ np.max([np.linalg.norm(X.T @ Lt, ord=np.inf), alpha])
+
+# Lasso dual value
+d_obj = c1  * ( norm(y)**2 - norm(y - alpha*n*theta)**2 )
+
+print(f"sklearn dual gap: {clf2.dual_gap_}")
+print(f"Implemented dual gap: {p_obj - d_obj}")
+# sklearn dual gap: 9.04182059547759e-05
+# Implemented scratch dual gap: 9.04182059547759e-05
+```
+
+If you are using an older version of `scikit-learn`, such as `0.23.2`, the dual gap may differ by a factor of 100. This was a bug that has been fixed in more recent versions of`scikit-learn`.
+
+## Dual of the Elastic Net
+
+We can define the Elastic Net primal objective function as:
+
+$$
+\begin{align}
+\frac{1}{2n} \lVert \mathbf{y} - \mathbf{X}\beta \rVert_2^2 + \lambda \left\{ \frac{1}{2}(1 - \alpha) \lVert \beta \rVert_2^2 + \alpha \lVert \beta \rVert_1 \right\}
+\end{align}
+$$
+
+How can we derive its dual form? One easy way is by recognizing that the Elastic Net is mathematically equivalent to the Lasso after transforming $\mathbf{X}$ and $\mathbf{y}$ (Zhou & Hastie, 2005). From there, we can derive its dual form using the results obtained above. Let the transformations be:
+
+$$
+\begin{align*}
+\mathbf{X}^* &= \begin{bmatrix} 
+\mathbf{X} \\
+\sqrt{\frac{\lambda (1 - \alpha)}{2}} \mathbf{I}
+\end{bmatrix}, \quad  
+\mathbf{y}^* = \begin{bmatrix} 
+\mathbf{y} \\
+\mathbf{0}
+\end{bmatrix}
+\end{align*}
+$$
+
+Thus, the Elastic Net is equivalent to the following Lasso problem:
+
+$$
+\begin{align}
+\frac{1}{2n} \lVert \mathbf{y}^* - \mathbf{X}^*\beta \rVert_2^2 + \lambda \alpha \lVert \beta \rVert_1
+\end{align}
+$$
+
+
+## References
+
+1. Tibshirani, R. (2015, October 13). Convex Optimization [Video].  YouTube: https://www.youtube.com/watch?v=SXCsps26Ryo
+2. Massias, M., Gramfort, A., & Salmon, J. (2018, July). Celer: a fast solver for the lasso with dual extrapolation. In International Conference on Machine Learning (pp. 3315-3324). PMLR.
+3. Zou, H., & Hastie, T. (2005). Regularization and variable selection via the elastic net. Journal of the Royal Statistical Society Series B: Statistical Methodology, 67(2), 301-320.
