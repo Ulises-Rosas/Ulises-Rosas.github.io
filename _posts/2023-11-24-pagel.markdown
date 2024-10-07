@@ -62,7 +62,7 @@ $$
 \begin{align}
 \mathbf{u}^\top\textbf{C}_{\lambda}\mathbf{u} & = \lambda\int_{\mathbb{R}}   p(\mathbf{x}) \, \mathbf{u}^\top(\mathbf{x} - \mu)(\mathbf{x} - \mu)^\top\mathbf{u}   \, d\mathbf{x} + (1-\lambda)\mathbf{u}^\top\mathbf{W}\mathbf{u}\\ 
 & = \lambda\int_{\mathbb{R}}   p(\mathbf{x}) \, \{(\mathbf{x} - \mu)^\top\mathbf{u}\}^\top(\mathbf{x} - \mu)^\top\mathbf{u}   \, d\mathbf{x} + (1-\lambda)\mathbf{u}^\top\mathbf{W}^{1/2}\mathbf{W}^{1/2}\mathbf{u} \\
-& = \lambda\int_{\mathbb{R}}   p(\mathbf{x}) \, ||(\mathbf{x} - \mu)^\top\mathbf{u}||^2   \, d\mathbf{x} + (1-\lambda) ||\mathbf{W}^{1/2}\mathbf{u}||^2 \geq 0 \text{ .}
+& = \lambda\int_{\mathbb{R}}   p(\mathbf{x}) \, \lVert (\mathbf{x} - \mu)^\top\mathbf{u} \rVert^2   \, d\mathbf{x} + (1-\lambda) \lVert \mathbf{W}^{1/2}\mathbf{u}\rVert^2 \geq 0 \text{ .}
 \end{align}
 $$
 
