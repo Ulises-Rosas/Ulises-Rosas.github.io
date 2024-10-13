@@ -45,7 +45,7 @@ $$
 \end{align*}
 $$
 
-We now form the Lagrangian function using the multiplier vector $\mathbf{\Lambda} \in \mathbb{R}^{n}$:
+We now form the Lagrangian function using the multiplier vector $\mathbf{\Lambda} \in \mathbb{R}^n$:
 
 $$
 \begin{align*}
