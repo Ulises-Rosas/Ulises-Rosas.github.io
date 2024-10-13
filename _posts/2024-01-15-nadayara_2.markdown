@@ -1,7 +1,7 @@
 ---
 layout: archive
 classes: wide
-title: More attention to the Nadayara-Watson regression
+title: More attention to the Nadaraya-Watson regression
 date:   2024-01-15
 categories: jekyll update
 excerpt: "A fun connection"
