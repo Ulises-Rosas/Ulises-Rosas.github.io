@@ -79,7 +79,7 @@ where $\textbf{X} \in \mathbb{R}^{n \times p}$ is matrix with observations,  $\t
 
 $$
 p(\mathbf{Y}|\mathbf{X},\beta) = \frac{1}{(2\pi)^{n/2}} \frac{1}{|\sigma^2 \mathbf{C}_{\lambda}|^{1/2}}
-\exp\{ -\frac{1}{2\sigma^2} (\mathbf{Y} - \mathbf{X}\beta)^\top \mathbf{C}_{\lambda}^{-1} (\mathbf{Y} - \mathbf{X}\beta) \} \text{ .}
+\exp\{ -\frac{1}{2} (\mathbf{Y} - \mathbf{X}\beta)^\top (\sigma^2\mathbf{C}_{\lambda})^{-1} (\mathbf{Y} - \mathbf{X}\beta) \} \text{ .}
 $$
 
 Here is where expressions such as $\mathbf{C}_{\lambda} = \lambda\Omega + (1 - \lambda)\mathbf{W}$ start singing and reveal to us something profound and interesting about the equation above. It implies that if we allow $\lambda$ to be $0$, the variability between species observations does not influence the likelihood, and only the variance of species is important. Conversely, if $\lambda$ is $1$, then the variances of between species are significant, but the within-species variability is not as crucial. This point is where the connection with linear mixed models becomes more apparent, as the random intercepts and slopes in mixed models also strive to find a balance between variations between individuals versus variations within individuals, which usually involve repeated measurements. Lynch (1991) proposed the phylogenetic version of mixed models, called the Phylogenetic Linear Mixed Model (PLMM). Historically, however, it was less popular than Felsenstein's (1985) Phylogenetic Independent Contrast (PIC), despite the fact that PIC can be seen as a special case of PLMM when there is not much variation within individuals (Garamszegi 2014), or, if we attempt to make a connection with $\lambda$, when $\lambda = 1$.
