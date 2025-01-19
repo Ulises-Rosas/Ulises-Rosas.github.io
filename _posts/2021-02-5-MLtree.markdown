@@ -289,8 +289,7 @@ Where transition/transversion ratio is given by $$k = \alpha/\beta$$ and the coe
 
 ## Python implementation
 
-Under the K2P model with $$k = 2$$, if we let a branch length be $$0.2$$, the probability transition matrix with $$t = 2$$ can be represented as:
-
+Under the K2P model with $$k = 2$$, if we let a branch length be $$0.2$$, the probability transition matrix can be represented as:
 
 $$
 \begin{align*}
