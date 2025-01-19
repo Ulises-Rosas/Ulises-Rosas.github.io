@@ -343,7 +343,7 @@ $$
 \begin{align*}
 \mathbf{X}^* &= \begin{bmatrix} 
 \mathbf{X} \\
-\sqrt{\frac{\lambda (1 - \alpha)}{2}} \mathbf{I}
+\sqrt{\frac{\lambda (1 - \alpha)}{2}n} \mathbf{I}
 \end{bmatrix}, \quad  
 \mathbf{y}^* = \begin{bmatrix} 
 \mathbf{y} \\
