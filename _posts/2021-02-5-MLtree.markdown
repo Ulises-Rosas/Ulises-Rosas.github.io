@@ -13,7 +13,7 @@ Consider the following tree:
 ![foo](/assets/images/ml_tree.png){: width="40%" }
 {: refdef}
 {:refdef: style="text-align: center;"}
-*Image from Yang 2014*
+*Figure 1. Tree from Yang 2014, pp. 103*
 {: refdef}
 
 
@@ -29,7 +29,7 @@ $$
 \end{equation}
 $$
 
-Where $$ f(x)$$ is a function that calculates the likelihood node states. If we apply lagorithms to both sides of the above equation we have:
+Where $$ f(x)$$ is a function that calculates the likelihood node states. If we apply logarithms to both sides of the above equation we have:
 
 $$
 \begin{equation}
@@ -96,7 +96,7 @@ Above factorization  is analogous to the factorization of $$ x^2 + x $$ into $$ 
 
 The probability of a base change takes the form of a Markov matrix (i.e., all elements $\geq 0$, all columns add to 1):
 
-$$ \textbf{p}(t) = \begin{array}{c c c} &
+$$ \mathbf{P}(t) = \begin{array}{c c c} &
 \begin{array}{c c c c c} T &&& C &&& A &&& G\\ \end{array} 
 \\
 \begin{array}{c c c c} T\\ C\\ A\\ G\\ \end{array} 
@@ -117,22 +117,22 @@ $$ \textbf{p}(t) = \begin{array}{c c c} &
 \end{array}
 $$
 
-And a property of the Markov process is $$ \textbf{p}(t_{1} + t_{2}) =  \textbf{p}(t_{1})\textbf{p}(t_{2}) = \textbf{p}(t_{2})\textbf{p}(t_{1})$$ (Chapman-Kolgomorov equation). If we substract $$ \textbf{p}(t_{1}) $$ at both sides we have:
+And a property of the Markov process is $$ \mathbf{P}(t_{1} + t_{2}) =  \mathbf{P}(t_{1})\mathbf{P}(t_{2}) = \mathbf{P}(t_{2})\mathbf{P}(t_{1})$$ (Chapman-Kolgomorov equation). If we substract $$ \mathbf{P}(t_{1}) $$ at both sides we have:
 
 $$
 \begin{equation}
-\textbf{p}(t_{1} + t_{2}) - \textbf{p}(t_{1}) =  \textbf{p}(t_{2})\textbf{p}(t_{1}) - \textbf{p}(t_{1})\\
-\textbf{p}(t_{1} + t_{2}) - \textbf{p}(t_{1}) =  (\textbf{p}(t_{2}) - \textbf{I})\textbf{p}(t_{1})
+\mathbf{P}(t_{1} + t_{2}) - \mathbf{P}(t_{1}) =  \mathbf{P}(t_{2})\mathbf{P}(t_{1}) - \mathbf{P}(t_{1})\\
+\mathbf{P}(t_{1} + t_{2}) - \mathbf{P}(t_{1}) =  \left(\mathbf{P}(t_{2}) - \textbf{I}\right)\mathbf{P}(t_{1})
 \end{equation}
 $$
 
-Notice that the identity matrix $$\textbf{I}$$ is equivalent to $$\textbf{p}(0)$$ as it is a diagonal of ones, thus no base change. Then, substituting $$\textbf{p}(0)$$ into above equation and applying limits with respect of $$t_{2}$$:
+Notice that the identity matrix $$\textbf{I}$$ is equivalent to $$\mathbf{P}(0)$$ as it is a diagonal of ones, thus no base change. Then, substituting $$\mathbf{P}(0)$$ into above equation and applying limits with respect of $$t_{2}$$:
 
 $$
 \begin{equation}
-\textbf{p}(t _1 + t_2) - \textbf{p}(t_1) =  (\textbf{p}(t_2) - \textbf{p}(0))\textbf{p}(t_1)\\
+\mathbf{P}(t _1 + t_2) - \mathbf{P}(t_1) =  \left(\mathbf{P}(t_2) - \mathbf{P}(0)\right)\mathbf{P}(t_1)\\
 
-\lim_{t_2 \to 0} \frac{ \textbf{p}(t_1 + t_2) - \textbf{p}(t_1) }{t_2} = \lim_{t_2 \to 0} \frac{\textbf{p}(t_2) - \textbf{p}(0)}{t_2}\textbf{p}(t_1)
+\lim_{t_2 \to 0} \frac{ \mathbf{P}(t_1 + t_2) - \mathbf{P}(t_1) }{t_2} = \lim_{t_2 \to 0} \frac{\mathbf{P}(t_2) - \mathbf{P}(0)}{t_2}\mathbf{P}(t_1)
 \end{equation}
 $$
 
@@ -140,16 +140,16 @@ Letting $$t_2$$ be $$ \Delta t $$, and putting a more straightforward format at 
 
 $$
 \begin{equation}
-\lim_{\Delta t \to 0} \frac{ \textbf{p}(t_1 + \Delta t) - \textbf{p}(t_1) }{\Delta t} = \lim_{\Delta t \to 0}\frac{\textbf{p}( 0 +  \Delta t) - \textbf{p}(0)}{\Delta t} \textbf{p}(t_1)\\
-\textbf{p}^{\prime}(t_1) = \textbf{p}^{\prime}(0)\textbf{p}(t_1)
+\lim_{\Delta t \to 0} \frac{ \mathbf{P}(t_1 + \Delta t) - \mathbf{P}(t_1) }{\Delta t} = \lim_{\Delta t \to 0}\frac{\mathbf{P}( 0 +  \Delta t) - \mathbf{P}(0)}{\Delta t} \mathbf{P}(t_1)\\
+\mathbf{P}^{\prime}(t_1) = \mathbf{P}^{\prime}(0)\mathbf{P}(t_1)
 \end{equation}
 $$
 
-The rate of change of the probability matrix at $$t = 0$$, $$\textbf{p}^{\prime}(0)$$, is also know as the $$ \textbf{Q} $$ matrix or instantaneous rate of change. We end up having the general form for matrix differentiation:
+The rate of change of the probability matrix at $$t = 0$$, $$\mathbf{P}^{\prime}(0)$$, is also know as the $$ \textbf{Q} $$ matrix or instantaneous rate of change. We end up having the general form for matrix differentiation:
 
 $$
 \begin{equation}
-\textbf{p}^{\prime}(t) = \textbf{Q}\textbf{p}(t)
+\mathbf{P}^{\prime}(t) = \textbf{Q}\mathbf{P}(t)
 \end{equation}
 $$
 
@@ -159,7 +159,7 @@ $$
 It works with almost all markdown flavours (the below blank line matters).
 
 --- -->
-<!-- > **_NOTE:_**  The rate of change of the probability matrix at $$t = 0$$, $$\textbf{p}^{\prime}(0)$$, is also know as the $$ \textbf{Q} $$ matrix or instantaneous rate of change. Then, changing $$\textbf{p}^{\prime}(0)$$ by $$ \textbf{Q} $$, and $$t_1$$ by $$t$$, we have the general form for matrix differentiation: -->
+<!-- > **_NOTE:_**  The rate of change of the probability matrix at $$t = 0$$, $$\mathbf{P}^{\prime}(0)$$, is also know as the $$ \textbf{Q} $$ matrix or instantaneous rate of change. Then, changing $$\mathbf{P}^{\prime}(0)$$ by $$ \textbf{Q} $$, and $$t_1$$ by $$t$$, we have the general form for matrix differentiation: -->
 
 ### Approximated solution
 
@@ -167,29 +167,29 @@ The general solution of a matrix differentiation for any $$t$$ is (see Box 1 for
 
 $$
 \begin{equation}
-\textbf{p}(t) = e^{ \textbf{Q}t  }\textbf{p}(0) = e^{ \textbf{Q}t  }\textbf{I} = e^{ \textbf{Q}t  }
+\mathbf{P}(t) = e^{ \textbf{Q}t  }\mathbf{P}(0) = e^{ \textbf{Q}t  }\textbf{I} = e^{ \textbf{Q}t  }
 \end{equation}
 $$
 
-Then, we can approximate $$ \textbf{p}(t) $$ with the following expansion of the exponential of a matrix:
+Then, we can approximate $$ \mathbf{P}(t) $$ with the following expansion of the exponential of a matrix:
 
 $$
 \begin{equation}
-\textbf{p}(t) = e^{ \textbf{Q}t } =  \frac{1}{0!}(\textbf{Q}t)^0 + \frac{1}{1!}(\textbf{Q}t)^1 + \frac{1}{2!}(\textbf{Q}t)^2 + \cdots\\
-\textbf{p}(t) =  \textbf{I} + \textbf{Q}t + \frac{1}{2!}(\textbf{Q}t)^2 + \cdots\\
+\mathbf{P}(t) = e^{ \textbf{Q}t } =  \frac{1}{0!}(\textbf{Q}t)^0 + \frac{1}{1!}(\textbf{Q}t)^1 + \frac{1}{2!}(\textbf{Q}t)^2 + \cdots\\
+\mathbf{P}(t) =  \textbf{I} + \textbf{Q}t + \frac{1}{2!}(\textbf{Q}t)^2 + \cdots\\
 \end{equation}
 $$
 
-Observations: i) $$ \textbf{p}(t) $$ is in function of time and the initial value $$\textbf{Q} $$, ii)  $$\textbf{Q} $$ contains information of the evolutionary model, iii) while above summation converges into a specific matrix in function of the number of terms considered, spectral decomposition could also be used when the matrix $\mathbf{Q}$ is positive semidefinite, a property seen in time-reversible Markov processes:
+Observations: i) $$ \mathbf{P}(t) $$ is in function of time and the initial value $$\textbf{Q} $$, ii)  $$\textbf{Q} $$ contains information of the evolutionary model, iii) while above summation converges into a specific matrix in function of the number of terms considered, spectral decomposition could also be used when the matrix $\mathbf{Q}$ is positive semidefinite, a property seen in time-reversible Markov processes:
 
 
 $$
 \begin{equation}
-\textbf{p}(t) = e^{ \textbf{Q}t } =  \mathbf{U}e^{\mathbf{\Lambda}t} \mathbf{U}^{-1}
+\mathbf{P}(t) = e^{ \textbf{Q}t } =  \mathbf{U}e^{\mathbf{\Lambda}t} \mathbf{U}^{-1}
 \end{equation}
 $$
 
-where $\mathbf{U}$ and $\mathbf{\Lambda}$ are the matrices of eigenvectors and eigenvalues, respectively. For instance, in models such as GTR, where $\mathbf{Q}$ is not necessarily symmetric, spectral decomposition remains applicable because $\mathbf{Q}$ can be expressed as the product of two symmetric matrices (Felsenstein 2004, pp. 206; Zhang 2014, pp. 67). For non-time-reversible Markov processes, an algorithm called *scale and squaring*, which is based on the first two terms of the expansion of $$  e^{ \textbf{Q}t } $$, is preferred (Zhang 2014, pp. 66).
+where $\mathbf{U}$ and $\mathbf{\Lambda}$ are the matrices of eigenvectors and eigenvalues, respectively. For instance, in models such as GTR, where $\mathbf{Q}$ is not necessarily symmetric, spectral decomposition remains applicable because $\mathbf{Q}$ can be expressed as the product of two symmetric matrices (Felsenstein 2004, pp. 206; Zhang 2014, pp. 67). For non-time-reversible Markov processes, an algorithm called *scaling and squaring*, which is based on the first two terms of the expansion of $$  e^{ \textbf{Q}t } $$, is preferred (Zhang 2014, pp. 66).
 
 <div class="warning" style='background-color:#E9D8FD; color: #69337A; border-left: solid #805AD5 4px; border-radius: 4px; padding:0.7em;'>
 <span>
@@ -197,70 +197,70 @@ where $\mathbf{U}$ and $\mathbf{\Lambda}$ are the matrices of eigenvectors and e
 <b>Box 1: Glimpse on matrix differentiation</b></p>
 <p style='margin-left:1em;'>
 
-Let $ \textbf{x} $ be a column vector and $ \textbf{A} $ be an invertible matrix. If we have the following form of vector differentiation: $ \textbf{x}^{\prime}  = \textbf{A}\textbf{x} $, we know its solution is $ \textbf{x}(t) =  e^{ \textbf{A}t } \textbf{x}(0) $. However, above solution form also holds when we have an square matrix such as $ \textbf{p}^{\prime} $. For example, if we represent $ \textbf{p}^{\prime} = \textbf{Q}\textbf{p} $ as:
+Let $ \textbf{x} $ be a column vector and $ \textbf{A} $ be an invertible matrix. If we have the following form of vector differentiation: $ \textbf{x}^{\prime}  = \textbf{A}\textbf{x} $, we know its solution is $ \textbf{x}(t) =  e^{ \textbf{A}t } \textbf{x}(0) $. However, above solution form also holds when we have an square matrix such as $ \mathbf{P}^{\prime} $. For example, if we represent $ \mathbf{P}^{\prime} = \textbf{Q}\mathbf{P} $ as:
 
 $$
 \begin{bmatrix} |                     &        & |                    \\
-                \textbf{p}^{\prime}_1 & \cdots & \textbf{p}^{\prime}_n\\
+                \mathbf{P}^{\prime}_1 & \cdots & \mathbf{P}^{\prime}_n\\
                 |                     &        & |                    \end{bmatrix}  = 
 \begin{bmatrix} - &  \textbf{q}_1 & - \\
                   & \vdots                 &   \\
                 - &  \textbf{q}_n & -  \end{bmatrix} 
 \begin{bmatrix} |            &        & |           \\
-                \textbf{p}_1 & \cdots & \textbf{p}_n\\
+                \mathbf{P}_1 & \cdots & \mathbf{P}_n\\
                 |            &        & |           \end{bmatrix}\\
 
 
 \begin{bmatrix} |                     &        & |                    \\
-                \textbf{p}^{\prime}_1 & \cdots & \textbf{p}^{\prime}_n\\
+                \mathbf{P}^{\prime}_1 & \cdots & \mathbf{P}^{\prime}_n\\
                 |                     &        & |                    \end{bmatrix}  = 
-\begin{bmatrix} \textbf{q}_1\textbf{p}_1 & \cdots & \textbf{q}_1\textbf{p}_n \\
+\begin{bmatrix} \textbf{q}_1\mathbf{P}_1 & \cdots & \textbf{q}_1\mathbf{P}_n \\
                 \vdots                   & \ddots & \vdots                    \\
-                \textbf{q}_n\textbf{p}_1 & \cdots & \textbf{q}_n\textbf{p}_n  \end{bmatrix} 
+                \textbf{q}_n\mathbf{P}_1 & \cdots & \textbf{q}_n\mathbf{P}_n  \end{bmatrix} 
 $$
 
 and taking only the first column from above matrices:
 
 $$
 \begin{bmatrix} |                     \\
-                \textbf{p}^{\prime}_1 \\
+                \mathbf{P}^{\prime}_1 \\
                 |                     \end{bmatrix}  = 
-\begin{bmatrix} \textbf{q}_1\textbf{p}_1 \\
+\begin{bmatrix} \textbf{q}_1\mathbf{P}_1 \\
                 \vdots                   \\
-                \textbf{q}_n\textbf{p}_1  \end{bmatrix} = 
+                \textbf{q}_n\mathbf{P}_1  \end{bmatrix} = 
 
 \begin{bmatrix} - & \textbf{q}_1 & - \\
                   & \vdots       &   \\
                 - & \textbf{q}_n & - \end{bmatrix} 
 \begin{bmatrix} |            \\
-                \textbf{p}_1 \\
-                |  \end{bmatrix}  = \textbf{Q}\textbf{p}_1
+                \mathbf{P}_1 \\
+                |  \end{bmatrix}  = \textbf{Q}\mathbf{P}_1
 $$
 
-$\textbf{p}^{\prime}_1$ column vector can be directly solved:
+$\mathbf{P}^{\prime}_1$ column vector can be directly solved:
 
 $$
-\textbf{p}^{\prime}_1 = \textbf{Q}\textbf{p}_1 \Rightarrow  \textbf{p}_1(t) =  e^{ \textbf{Q}t } \textbf{p}_1(0)
+\mathbf{P}^{\prime}_1 = \textbf{Q}\mathbf{P}_1 \Rightarrow  \mathbf{P}_1(t) =  e^{ \textbf{Q}t } \mathbf{P}_1(0)
 $$
 
 Plugging back all solved columns into the original matrix:
 
 $$
 \begin{bmatrix} |               &        & |              \\
-                \textbf{p}_1(t) & \cdots & \textbf{p}_n(t)\\
+                \mathbf{P}_1(t) & \cdots & \mathbf{P}_n(t)\\
                 |               &        & |              \end{bmatrix}  = 
 \begin{bmatrix} |                                 &        & |                                \\
-                e^{ \textbf{Q}t } \textbf{p}_1(0) & \cdots & e^{ \textbf{Q}t } \textbf{p}_n(0)\\
+                e^{ \textbf{Q}t } \mathbf{P}_1(0) & \cdots & e^{ \textbf{Q}t } \mathbf{P}_n(0)\\
                 |                                 &        & |                                 \end{bmatrix}\\
 
 \begin{bmatrix} |               &        & |              \\
-                \textbf{p}_1(t) & \cdots & \textbf{p}_n(t)\\
+                \mathbf{P}_1(t) & \cdots & \mathbf{P}_n(t)\\
                 |               &        & |              \end{bmatrix}  = 
 e^{ \textbf{Q}t }\begin{bmatrix} |               &        & |              \\
-                                 \textbf{p}_1(0) & \cdots & \textbf{p}_n(0)\\
+                                 \mathbf{P}_1(0) & \cdots & \mathbf{P}_n(0)\\
                                  |               &        & |               \end{bmatrix}\\
 
-\Rightarrow \textbf{p}(t) = e^{ \textbf{Q}t }\textbf{p}(0)
+\Rightarrow \mathbf{P}(t) = e^{ \textbf{Q}t }\mathbf{P}(0)
 $$
 
 
@@ -276,7 +276,7 @@ There are some cases where exact solution can be obtained without the need of nu
 
 $$
 \begin{equation}
-P_{i,j}(d)=\begin{cases}
+p_{i,j}(d)=\begin{cases}
               \frac{1}{4}( 1 + e^{-4d/(k+2)} + 2e^{-2d(k+1)/(k+2)}) &, \text{if i = j }\\
               \frac{1}{4}( 1 + e^{-4d/(k+2)} - 2e^{-2d(k+1)/(k+2)}) &, \text{if transition}\\
               \frac{1}{4}( 1 - e^{-4d/(k+2)} ) &, \text{if transversion}\\
@@ -288,62 +288,84 @@ Where transition/transversion ratio is given by $$k = \alpha/\beta$$ and the coe
 
 
 ## Python implementation
-To obtain the probabilities of the tips we know that:
 
-$$L_{7}(T) = P_{TT}(0.2) \times P_{TC}(0.2) = 0.825 \times 0.084 = 0.069$$
-$$L_{7}(C) = P_{CT}(0.2) \times P_{CC}(0.2) = 0.084 \times 0.825 = 0.069$$
-$$L_{7}(A) = P_{AT}(0.2) \times P_{AC}(0.2) = 0.045 \times 0.045 = 0.002$$
-$$L_{7}(G) = P_{GT}(0.2) \times P_{GC}(0.2) = 0.045 \times 0.045 = 0.002$$
+Under the K2P model with $$k = 2$$, if we let a branch length be $$0.2$$, the probability transition matrix with $$t = 2$$ can be represented as:
 
 
-But, this can also be re-written as:
+$$
+\begin{align*}
+\mathbf{P}(0.2) =  \begin{bmatrix} 0.825 & 0.084 & 0.045 & 0.045\\
+                    0.084 & 0.825 & 0.045 & 0.045\\
+                    0.045 & 0.045 & 0.825 & 0.084\\
+                    0.045 & 0.045 & 0.084 & 0.825 \end{bmatrix}
+\end{align*}
+$$
+
+For this Python implementation, we assume that all leaf branches are $$0.2$$, internal branches are $$0.1$$, and $$k = 2$$ is fixed. 
+
+Let's focus on node $$7$$ of Fig. 1. The probabilities for each base at node $$7$$, derived from tip $$1$$ (T) and tip $$2$$ (C), are as follows:
+
+$$
+\begin{align*}
+L_{7}(T) & = P_{TT}(0.2) \times P_{TC}(0.2) = 0.825 \times 0.084 = 0.069\\
+L_{7}(C) & = P_{CT}(0.2) \times P_{CC}(0.2) = 0.084 \times 0.825 = 0.069\\
+L_{7}(A) & = P_{AT}(0.2) \times P_{AC}(0.2) = 0.045 \times 0.045 = 0.002\\
+L_{7}(G) & = P_{GT}(0.2) \times P_{GC}(0.2) = 0.045 \times 0.045 = 0.002
+\end{align*}
+$$
+
+This can also be rewritten in terms of probability vectors:
 
 $$
 \begin{align}
-L_{7} & = \begin{bmatrix} 0.069 & 0.069 & 0.002 & 0.002 \end{bmatrix} \\
+\mathbf{L}_{7} & = \begin{bmatrix} 0.069 & 0.069 & 0.002 & 0.002 \end{bmatrix} \\
 & = \begin{bmatrix} 0.825 & 0.084 & 0.045 & 0.045 \end{bmatrix}  \odot
-		\begin{bmatrix} 0.084 & 0.825 & 0.045 & 0.045 \end{bmatrix}\\
-& = X  \odot Y
+        \begin{bmatrix} 0.084 & 0.825 & 0.045 & 0.045 \end{bmatrix}\\
+& = \mathbf{L}_{x} \odot \mathbf{L}_{y},
 \end{align}
 $$
 
-In turn, $$X$$ and $$Y$$ can be re-written as:
+where $$\odot$$ represents element-wise multiplication. Notice that $$\mathbf{L}_{x}$$ and $$\mathbf{L}_{y}$$ can, in turn, be rewritten as:
 
 $$
-X = \begin{bmatrix} 1 & 0 & 0 & 0 \end{bmatrix} \cdot 
-    \begin{bmatrix} 0.825 & 0.084 & 0.045 & 0.045\\
-                    0.084 & 0.825 & 0.045 & 0.045\\
-                    0.045 & 0.045 & 0.825 & 0.084\\
-                    0.045 & 0.045 & 0.084 & 0.825 \end{bmatrix}
+\begin{align}
+\mathbf{L}_{x} 
+= \underbrace{ \begin{bmatrix} 1 & 0 & 0 & 0 \end{bmatrix}}_{T} \mathbf{P}(0.2)  
+= \mathbf{L}_{1}\mathbf{P}(0.2)\\
+\mathbf{L}_{y} = 
+\underbrace{\begin{bmatrix} 0 & 1 & 0 & 0 \end{bmatrix} }_{C} \mathbf{P}(0.2) 
+= \mathbf{L}_{2}\mathbf{P}(0.2).
+\end{align}
 $$
 
-$$
-Y = \begin{bmatrix} 0 & 1 & 0 & 0 \end{bmatrix} \cdot 
-    \begin{bmatrix} 0.825 & 0.084 & 0.045 & 0.045\\
-                    0.084 & 0.825 & 0.045 & 0.045\\
-                    0.045 & 0.045 & 0.825 & 0.084\\
-                    0.045 & 0.045 & 0.084 & 0.825 \end{bmatrix}
-$$
-
-Where $$L_{1} = \begin{bmatrix} 1 & 0 & 0 & 0 \end{bmatrix}$$ represents the base T at the terminal node 1
-and  $$L_{2} = \begin{bmatrix} 0 & 1 & 0 & 0 \end{bmatrix}$$ represents the base C at the terminal node 2. Then,
- $$L_{7}$$ can be expressed in terms of daughter's likelihood and $$P$$ matrix:
+Here, $$\mathbf{L}_{1}$$ and $$\mathbf{L}_{2}$$ represent the one-hot encoding row vectors for T at node $$1$$ and C at node $$2$$, respectively. Then, $$\mathbf{L}_{7}$$ at parent node $$7$$ can be expressed in terms of the children's probability vectors and the transition matrix $$\mathbf{P}$$:
 
 $$
-L_{7} = X  \odot Y =  L_{1} \cdot P_{(0.2)} \odot L_{2} \cdot P_{(0.2)}
+\begin{align}
+\mathbf{L}_{7} & = \mathbf{L}_{x} \odot \mathbf{L}_{y}  = \mathbf{L}_{1}\mathbf{P}(0.2) \odot \mathbf{L}_{2}\mathbf{P}(0.2).
+\end{align}
 $$
 
-From there it follows the Felsenstein prunning algorithm. Here is an possible implementation of it.
+Generally, for a parent node $$k$$ and child nodes $$i$$ and $$j$$, with branch lengths $$t_i$$ and $$t_j$$, respectively, we have the following recursive relation:
 
+$$
+\begin{align}
+\mathbf{L}_{k} = \mathbf{L}_{i}\mathbf{P}(t_i) \odot \mathbf{L}_{j}\mathbf{P}(t_j) \text{ .}
+\end{align}
+$$
+
+From there, it follows the Felsenstein pruning algorithm. As mentioned above, we are fixing the branch lengths and the substitution parameter. Determining the branch lengths and substitution parameters given a tree toplogy requires further derivations (e.g., second-order optimization of the likelihood function), which are not straightforward from the above derivations. This will be the focus of another blog post. For now, by fixing all these parameters, here is a possible implementation of the tree's likelihood.
+
+
+### Kimura's two-parameters 
 
 ```python
 import math
 import numpy as np
 ```
 
-### Kimura's two-parameters 
-
 Kimura's two-parameters equation for comparing two bases ($$i, j$$):
+
 ```python
 def k2p(i, j, d, k):
     _lib = {
@@ -381,10 +403,7 @@ def P_mat(d,k):
 
 ```
 
-<!-- 
-\left[\matrix{a^2-b^2& -1\\ 1& 2ab}\right] -->
-
-My tree:
+Here is a possible tree representation in Fig. 1:
 
 ```python
 tree = {   
