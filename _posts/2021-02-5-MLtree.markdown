@@ -276,11 +276,11 @@ There are some cases where exact solution can be obtained without the need of nu
 
 $$
 \begin{equation}
-p_{i,j}(d)=\begin{cases}
-              \frac{1}{4}( 1 + e^{-4d/(k+2)} + 2e^{-2d(k+1)/(k+2)}) &, \text{if i = j }\\
-              \frac{1}{4}( 1 + e^{-4d/(k+2)} - 2e^{-2d(k+1)/(k+2)}) &, \text{if transition}\\
-              \frac{1}{4}( 1 - e^{-4d/(k+2)} ) &, \text{if transversion}\\
-             \end{cases}
+P_{i,j}(d)=\begin{cases}
+    \frac{1}{4}( 1 + e^{-4d/(k+2)} + 2e^{-2d(k+1)/(k+2)}) &, \text{if i = j }\\
+    \frac{1}{4}( 1 + e^{-4d/(k+2)} - 2e^{-2d(k+1)/(k+2)}) &, \text{if transition}\\
+    \frac{1}{4}( 1 - e^{-4d/(k+2)} ) &, \text{if transversion}
+\end{cases}
 \end{equation}            
 $$
 
@@ -289,7 +289,7 @@ Where transition/transversion ratio is given by $$k = \alpha/\beta$$ and the coe
 
 ## Python implementation
 
-Under the K2P model with $$k = 2$$, if we let a branch length be $$0.2$$, the probability transition matrix can be represented as:
+Under the K2P model with $$k = 2$$, if we let a branch length be $$0.2$$, then the probability transition matrix can be represented as:
 
 $$
 \begin{align*}
@@ -329,10 +329,10 @@ where $$\odot$$ represents element-wise multiplication. Notice that $$\mathbf{L}
 $$
 \begin{align}
 \mathbf{L}_{x} 
-= \underbrace{ \begin{bmatrix} 1 & 0 & 0 & 0 \end{bmatrix}}_{T} \mathbf{P}(0.2)  
+& = \underbrace{ \begin{bmatrix} 1 & 0 & 0 & 0 \end{bmatrix}}_{T} \mathbf{P}(0.2)  
 = \mathbf{L}_{1}\mathbf{P}(0.2)\\
-\mathbf{L}_{y} = 
-\underbrace{\begin{bmatrix} 0 & 1 & 0 & 0 \end{bmatrix} }_{C} \mathbf{P}(0.2) 
+\mathbf{L}_{y} 
+& = \underbrace{\begin{bmatrix} 0 & 1 & 0 & 0 \end{bmatrix} }_{C} \mathbf{P}(0.2) 
 = \mathbf{L}_{2}\mathbf{P}(0.2).
 \end{align}
 $$
@@ -406,94 +406,83 @@ Here is a possible tree representation in Fig. 1:
 
 ```python
 tree = {   
-  0: {'data': None, 'daughters': [6, 8], 'parent': None},
-  1: {'data': [1, 0, 0, 0], 'daughters': [], 'parent': 7},
-  2: {'data': [0, 1, 0, 0], 'daughters': [], 'parent': 7},
-  3: {'data': [0, 0, 1, 0], 'daughters': [], 'parent': 6},
-  4: {'data': [0, 1, 0, 0], 'daughters': [], 'parent': 8},
-  5: {'data': [0, 1, 0, 0], 'daughters': [], 'parent': 8},
-  6: {'data': None, 'daughters': [3, 7], 'parent': 0},
-  7: {'data': None, 'daughters': [1, 2], 'parent': 6},
-  8: {'data': None, 'daughters': [4, 5], 'parent': 0} }
-```
-
-
-```python
-
-terminal_q = P_mat(0.2, 2)
-internal_q = P_mat(0.1, 2)
-
-def update_probs(tree, node):
-    probs     = np.array(tree[node]['data'])
-    daughters = tree[node]['daughters']
-    if not daughters:
-        return probs.dot(terminal_q)
-
-    else:
-        return probs.dot(internal_q)
+  0: {'L': None, 'daughters': [6, 8], 'parent': None, 'blen': 0.0},
+  1: {'L': [1, 0, 0, 0], 'daughters': [], 'parent': 7, 'blen': 0.2},
+  2: {'L': [0, 1, 0, 0], 'daughters': [], 'parent': 7, 'blen': 0.2},
+  3: {'L': [0, 0, 1, 0], 'daughters': [], 'parent': 6, 'blen': 0.2},
+  4: {'L': [0, 1, 0, 0], 'daughters': [], 'parent': 8, 'blen': 0.2},
+  5: {'L': [0, 1, 0, 0], 'daughters': [], 'parent': 8, 'blen': 0.2},
+  6: {'L': None, 'daughters': [3, 7], 'parent': 0, 'blen': 0.1},
+  7: {'L': None, 'daughters': [1, 2], 'parent': 6, 'blen': 0.1},
+  8: {'L': None, 'daughters': [4, 5], 'parent': 0, 'blen': 0.1}, 
+}
 ```
 
 ### Recursive function
 
+Via a Depth-First Search style
+
 ```python
-def update_recursively(node):
-    print(node)
-
-    if node is not None:
-        daughters = tree[node]['daughters']
-        no_data = [ d for d in daughters if tree[d]['data'] is None ]
-
-        if no_data:
-            return update_recursively(no_data[0])
-
-        new_prob = np.ones((4,))
-        for d in daughters:
-            new_prob *= update_probs(tree, d)
-
-        tree[node]['data'] = new_prob
-        anc_node = tree[node]['parent']
-        return update_recursively(anc_node)
+def dfs(n):
+    print(n)
+    daughters = tree[n]['daughters']
+    if daughters:
+        left, right = daughters
+        dfs(left)
+        dfs(right)
+        # calculate children's likelihoods
+        t_l = tree[left]['blen']
+        t_r = tree[right]['blen']
+        Lx = tree[left]['L'] @ P_mat(t_l, 2)
+        Ly = tree[right]['L'] @ P_mat(t_r, 2)
+        # calculate ancestor's likelihoods
+        tree[n]['L'] = Lx * Ly
 ```
+
 Let's run this function from the node 0
 
 ```python
-update_recursively(node = 0)
+dfs(0)
 0
 6
+3
 7
-6
-0
+1
+2
 8
-0
-None
+4
+5
 ```
 
-Now, if we see our initial tree:
+Now, if we see our tree after the recursive calls:
 ```python
 print(tree)
 ```
 ```
-{   
-  0: {'data': array([1.120e-04, 1.838e-03, 7.500e-05, 1.400e-05]),
-      'daughters': [6, 8],
-      'parent': None},
-  1: {'data': [1, 0, 0, 0], 'daughters': [], 'parent': 7},
-  2: {'data': [0, 1, 0, 0], 'daughters': [], 'parent': 7},
-  3: {'data': [0, 0, 1, 0], 'daughters': [], 'parent': 6},
-  4: {'data': [0, 1, 0, 0], 'daughters': [], 'parent': 8},
-  5: {'data': [0, 1, 0, 0], 'daughters': [], 'parent': 8},
-  6: {'data': array([0.00300556, 0.00300556, 0.00434364, 0.00044365]),
-      'daughters': [3, 7],
-      'parent': 0},
-  7: {'data': array([0.06953344, 0.06953344, 0.00205366, 0.00205366]),
-      'daughters': [1, 2],
-      'parent': 6},
-  8: {'data': array([0.00710204, 0.68077648, 0.00205366, 0.00205366]),
-      'daughters': [4, 5],
-      'parent': 0}}
+{0: {'L': array([1.12371115e-04, 1.83822624e-03, 7.51370241e-05, 1.36379296e-05]),
+  'daughters': [6, 8],
+  'parent': None,
+  'blen': 0.0},
+ 1: {'L': [1, 0, 0, 0], 'daughters': [], 'parent': 7, 'blen': 0.2},
+ 2: {'L': [0, 1, 0, 0], 'daughters': [], 'parent': 7, 'blen': 0.2},
+ 3: {'L': [0, 0, 1, 0], 'daughters': [], 'parent': 6, 'blen': 0.2},
+ 4: {'L': [0, 1, 0, 0], 'daughters': [], 'parent': 8, 'blen': 0.2},
+ 5: {'L': [0, 1, 0, 0], 'daughters': [], 'parent': 8, 'blen': 0.2},
+ 6: {'L': array([0.00300556, 0.00300556, 0.00434364, 0.00044365]),
+  'daughters': [3, 7],
+  'parent': 0,
+  'blen': 0.1},
+ 7: {'L': array([0.06953344, 0.06953344, 0.00205366, 0.00205366]),
+  'daughters': [1, 2],
+  'parent': 6,
+  'blen': 0.1},
+ 8: {'L': array([0.00710204, 0.68077648, 0.00205366, 0.00205366]),
+  'daughters': [4, 5],
+  'parent': 0,
+  'blen': 0.1}}
 ```
 
-Finally, the likelihood of a particular tree is given by the probability vector for the root (i.e., `tree[0]['data']` above), multiplied by the equilibrium distribution $\pi$, which is 1/4 in both the K2P and JC models:
+Finally, the likelihood of a particular tree is given by the probability vector for the root (i.e., `tree[0]['L']` above), multiplied by the equilibrium distribution $\pi$, which is 1/4 in both the K2P and JC models:
 
 $$
 \begin{equation}
@@ -504,7 +493,7 @@ $$
 This can be simply implemented in code as:
 
 ```python
-sum(0.25 * tree[0]['data'])
+sum(0.25 * tree[0]['L'])
 # Likelihood: 0.0005098430765880512
 ```
 
