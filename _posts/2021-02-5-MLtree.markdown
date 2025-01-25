@@ -174,14 +174,14 @@ $$
 Then, we can approximate $$ \mathbf{P}(t) $$ with the following expansion of the exponential of a matrix:
 
 $$
-\begin{equation}
-\mathbf{P}(t) = e^{ \textbf{Q}t } =  \frac{1}{0!}(\textbf{Q}t)^0 + \frac{1}{1!}(\textbf{Q}t)^1 + \frac{1}{2!}(\textbf{Q}t)^2 + \cdots\\
-\mathbf{P}(t) =  \textbf{I} + \textbf{Q}t + \frac{1}{2!}(\textbf{Q}t)^2 + \cdots\\
-\end{equation}
+\begin{align}
+\mathbf{P}(t) & = e^{ \textbf{Q}t }\\
+&  =  \frac{1}{0!}(\textbf{Q}t)^0 + \frac{1}{1!}(\textbf{Q}t)^1 + \frac{1}{2!}(\textbf{Q}t)^2 + \cdots\\
+& =  \textbf{I} + \textbf{Q}t + \frac{1}{2!}(\textbf{Q}t)^2 + \cdots\\
+\end{align}
 $$
 
 Observations: i) $$ \mathbf{P}(t) $$ is in function of time and the initial value $$\textbf{Q} $$, ii)  $$\textbf{Q} $$ contains information of the evolutionary model, iii) while above summation converges into a specific matrix in function of the number of terms considered, spectral decomposition could also be used when the matrix $\mathbf{Q}$ is positive semidefinite, a property seen in time-reversible Markov processes:
-
 
 $$
 \begin{equation}
@@ -197,73 +197,31 @@ where $\mathbf{U}$ and $\mathbf{\Lambda}$ are the matrices of eigenvectors and e
 <b>Box 1: Glimpse on matrix differentiation</b></p>
 <p style='margin-left:1em;'>
 
-Let $ \textbf{x} $ be a column vector and $ \textbf{A} $ be an invertible matrix. If we have the following form of vector differentiation: $ \textbf{x}^{\prime}  = \textbf{A}\textbf{x} $, we know its solution is $ \textbf{x}(t) =  e^{ \textbf{A}t } \textbf{x}(0) $. However, above solution form also holds when we have an square matrix such as $ \mathbf{P}^{\prime} $. For example, if we represent $ \mathbf{P}^{\prime} = \textbf{Q}\mathbf{P} $ as:
-
+Let $\mathbf{x}$ be a column vector and $\mathbf{A}$ an invertible matrix. Suppose we have the differential equation $\mathbf{x}'(t) = \mathbf{A}\,\mathbf{x}(t)$, its solution is $\mathbf{x}(t) = e^{\mathbf{A}t}\,\mathbf{x}(0).$ This same solution form also applies  when we have a matrix-value function such as $\mathbf{P}'(t) = \mathbf{Q}\,\mathbf{P}(t)$ for some square matrix $\mathbf{Q}$. To see why, we can use an integrating factor. Multiply both sides of the equation by $e^{-t\mathbf{Q}}$:
 $$
-\begin{bmatrix} |                     &        & |                    \\
-                \mathbf{P}^{\prime}_1 & \cdots & \mathbf{P}^{\prime}_n\\
-                |                     &        & |                    \end{bmatrix}  = 
-\begin{bmatrix} - &  \textbf{q}_1 & - \\
-                  & \vdots                 &   \\
-                - &  \textbf{q}_n & -  \end{bmatrix} 
-\begin{bmatrix} |            &        & |           \\
-                \mathbf{P}_1 & \cdots & \mathbf{P}_n\\
-                |            &        & |           \end{bmatrix}\\
-
-
-\begin{bmatrix} |                     &        & |                    \\
-                \mathbf{P}^{\prime}_1 & \cdots & \mathbf{P}^{\prime}_n\\
-                |                     &        & |                    \end{bmatrix}  = 
-\begin{bmatrix} \textbf{q}_1\mathbf{P}_1 & \cdots & \textbf{q}_1\mathbf{P}_n \\
-                \vdots                   & \ddots & \vdots                    \\
-                \textbf{q}_n\mathbf{P}_1 & \cdots & \textbf{q}_n\mathbf{P}_n  \end{bmatrix} 
+\begin{aligned}
+e^{-t\mathbf{Q}}\mathbf{P}^{\prime}(t) & = e^{-t\mathbf{Q}}\mathbf{Q}\mathbf{P}(t) \\
+e^{-t\mathbf{Q}}\mathbf{P}^{\prime}(t) +
+\left(-e^{-t\mathbf{Q}}\mathbf{Q}\right)    \mathbf{P}(t) 
+& = \mathbf{0}\\
+e^{-t\mathbf{Q}}\mathbf{P}^{\prime}(t) +
+\left(e^{-t\mathbf{Q}}\right)^{\prime}\mathbf{P}(t) 
+& = \mathbf{0}\\
+\left(e^{-t\mathbf{Q}}\mathbf{P}(t) \right)^{\prime}
+& = \mathbf{0}
+\end{aligned}
 $$
-
-and taking only the first column from above matrices:
-
+Integrating shows that $e^{-t\mathbf{Q}}\,\mathbf{P}(t)$ is a constant matrix, call it $\mathbf{c}$. Hence,
 $$
-\begin{bmatrix} |                     \\
-                \mathbf{P}^{\prime}_1 \\
-                |                     \end{bmatrix}  = 
-\begin{bmatrix} \textbf{q}_1\mathbf{P}_1 \\
-                \vdots                   \\
-                \textbf{q}_n\mathbf{P}_1  \end{bmatrix} = 
-
-\begin{bmatrix} - & \textbf{q}_1 & - \\
-                  & \vdots       &   \\
-                - & \textbf{q}_n & - \end{bmatrix} 
-\begin{bmatrix} |            \\
-                \mathbf{P}_1 \\
-                |  \end{bmatrix}  = \textbf{Q}\mathbf{P}_1
+e^{-t\mathbf{Q}}\,\mathbf{P}(t) = \mathbf{c}
+\quad\Longrightarrow\quad
+\mathbf{P}(t) = e^{t\mathbf{Q}}\,\mathbf{c}.
 $$
-
-$\mathbf{P}^{\prime}_1$ column vector can be directly solved:
-
+Evaluating at $t = 0$ gives $\mathbf{P}(0)  = e^{0\mathbf{Q}}\,\mathbf{c}  = \mathbf{I}\,\mathbf{c} = \mathbf{c}.$ Therefore,
 $$
-\mathbf{P}^{\prime}_1 = \textbf{Q}\mathbf{P}_1 \Rightarrow  \mathbf{P}_1(t) =  e^{ \textbf{Q}t } \mathbf{P}_1(0)
+\mathbf{P}(t) 
+= e^{t\mathbf{Q}}\,\mathbf{P}(0).
 $$
-
-Plugging back all solved columns into the original matrix:
-
-$$
-\begin{bmatrix} |               &        & |              \\
-                \mathbf{P}_1(t) & \cdots & \mathbf{P}_n(t)\\
-                |               &        & |              \end{bmatrix}  = 
-\begin{bmatrix} |                                 &        & |                                \\
-                e^{ \textbf{Q}t } \mathbf{P}_1(0) & \cdots & e^{ \textbf{Q}t } \mathbf{P}_n(0)\\
-                |                                 &        & |                                 \end{bmatrix}\\
-
-\begin{bmatrix} |               &        & |              \\
-                \mathbf{P}_1(t) & \cdots & \mathbf{P}_n(t)\\
-                |               &        & |              \end{bmatrix}  = 
-e^{ \textbf{Q}t }\begin{bmatrix} |               &        & |              \\
-                                 \mathbf{P}_1(0) & \cdots & \mathbf{P}_n(0)\\
-                                 |               &        & |               \end{bmatrix}\\
-
-\Rightarrow \mathbf{P}(t) = e^{ \textbf{Q}t }\mathbf{P}(0)
-$$
-
-
 </p>
 
 </span>
@@ -384,7 +342,6 @@ def k2p(i, j, d, k):
         else:
             # transversion
             return 0.25*(1 - first_t(d,k))
-
 ```
 P matrix implementation:
 ```python
@@ -399,7 +356,6 @@ def P_mat(d,k):
                 [k2p(bases[2], i, d, k) for i in bases],
                 [k2p(bases[3], i, d, k) for i in bases]
             ])
-
 ```
 
 Here is a possible tree representation in Fig. 1:
