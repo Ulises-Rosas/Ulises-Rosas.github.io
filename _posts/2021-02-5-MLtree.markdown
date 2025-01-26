@@ -44,20 +44,20 @@ Then, we just need to define $$ f(x)$$ and sum all terms of the right side of ab
 The function $$ f(x) $$ can be defined as the sum over all possible combinations of nucleotide change probability from tips to $$ x_{0} $$:
 
 $$
-\begin{equation}
+\begin{align}
 f(\textbf{x}_{i}| \theta) = \sum_{x_{0}} \sum_{x_{6}} \sum_{x_{7}} \sum_{x_{8}} \left[ 
 \pi_{x_{0}} P_{x_{0},x_{6}}(t_{6}) P_{x_{0},x_{8}}(t_{8})\\
 \hspace{125mm} P_{C,x_{8}}(t_{4}) P_{C,x_{8}}(t_{5}) \\
 \hspace{80mm} P_{A,x_{6}}(t_{3}) P_{x_{6},x_{7}}(t_{7}) \\ 
 \hspace{125mm} P_{T,x_{7}}(t_{1}) P_{C,x_{7}}(t_{2}) \right]
-\end{equation}
+\end{align}
 $$
 
 Where $$\pi_{x_{0}}$$ is the stationary probability (e.g., 0.25 for the K80 model), $$ P_{i,j}(t) $$ is the probability of base change $$ i \rightarrow j$$ (or $$ i \leftarrow j$$ due to reversebility of most DNA evolution models) along the branch length $$t$$, obtained from the $$Q$$ matrix (see below). While the above equation is enough to start estimating site likelihoods, the equation is not computationally efficient. For example, let expand the summation of all states in $$x_{8}$$ (i.e., $$A, G, C, T$$):
 
 
 $$
-\begin{equation}
+\begin{align}
 f(\textbf{x}_{i}| \theta) = \sum_{x_{0}} \sum_{x_{6}} \sum_{x_{7}} \left[ 
 
 \left(\pi_{x_{0}} P_{x_{0},x_{6}}(t_{6}) P_{x_{0},A}(t_{8})\\
@@ -71,7 +71,7 @@ f(\textbf{x}_{i}| \theta) = \sum_{x_{0}} \sum_{x_{6}} \sum_{x_{7}} \left[
 \hspace{115mm} P_{C,T}(t_{4}) P_{C,T}(t_{5}) \\
 \hspace{73mm} P_{A,x_{6}}(t_{3}) P_{x_{6},x_{7}}(t_{7}) \\ 
 \hspace{124mm} P_{T,x_{7}}(t_{1}) P_{C,x_{7}}(t_{2}) \right)\right]
-\end{equation}
+\end{align}
 $$
 
 We should have 8 multiplications (i.e., number of nodes - 1) for each base (i.e., 4) and 3 additions (i.e., number of bases - 1). If we denote $$s$$ the number of species and $$b$$ the number of bases, then the number of operations after completely expading above equation is $$ (2sb - b - 1)b^{s - 2} $$. For our tree the number of operations then would be $$(2(5)(4) - 4 - 1)4^{5 - 2} = 2240$$ per site; for s = 20 it is 10,651,518,894,080
@@ -191,7 +191,7 @@ $$
 
 where $\mathbf{U}$ and $\mathbf{\Lambda}$ are the matrices of eigenvectors and eigenvalues, respectively. For instance, in models such as GTR, where $\mathbf{Q}$ is not necessarily symmetric, spectral decomposition remains applicable because $\mathbf{Q}$ can be expressed as the product of two symmetric matrices (Felsenstein 2004, pp. 206; Zhang 2014, pp. 67). For non-time-reversible Markov processes, an algorithm called *scaling and squaring*, which is based on the first two terms of the expansion of $$  e^{ \textbf{Q}t } $$, is preferred (Zhang 2014, pp. 66).
 
-<div class="warning" style='background-color:#E9D8FD; color: #69337A; border-left: solid #805AD5 4px; border-radius: 4px; padding:0.7em;'>
+<div class="warning" style='background-color:#E9D8FD; color: #69337A; border-left: solid #805AD5 4px; border-radius: 4px; padding:0.8em;'>
 <span>
 <p style='margin-top:1em; text-align:center'>
 <b>Box 1: Glimpse on matrix differentiation</b></p>
@@ -458,3 +458,4 @@ sum(0.25 * tree[0]['L'])
 1. Yang, Z. (2014). Molecular evolution: a statistical approach. Oxford University Press.
 2. Felenstein, J. (2004). Inferring phylogenies. Sunderland, MA: Sinauer associates.
 3. Pupko, T., & Mayrose, I. (2020). A gentle introduction to probabilistic evolutionary models.
+4. Hirsch, M. W., Smale, S., & Devaney, R. L. (2013). Differential equations, dynamical systems, and an introduction to chaos. Academic press.
