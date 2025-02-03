@@ -56,7 +56,7 @@ $$
 \end{align*}
 $$
 
-In the expression above, we minimize $T_1$ with respect to $\mathbf{z}$ and $T_2$ with respect to $\beta$. Minimizing $T_1$ is straightforward, as it involves a quadratic term. For $T_2$, there are two approaches: a longer one and a shorter one. The shorter approach uses convex conjugate rules, which I will omit here. Instead, I will follow the longer approach, which makes more sense to me at the moment. 
+Unlike inequality constraints with 'less than or equal to,' the signs of $\mathbf{\Lambda}$ are not necessarily restricted to be positive. In the expression above, we minimize $T_1$ with respect to $\mathbf{z}$ and $T_2$ with respect to $\beta$. Minimizing $T_1$ is straightforward, as it involves a quadratic term. For $T_2$, there are two approaches: a longer one and a shorter one. The shorter approach uses convex conjugate rules, which I will omit here. Instead, I will follow the longer approach, which makes more sense to me at the moment. 
 
 The main goal of the Lagrangian is to express everything in terms of $\mathbf{\Lambda}$. Once we achieve this, we will obtain our dual objective function.
 
