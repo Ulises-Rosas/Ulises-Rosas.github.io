@@ -245,7 +245,7 @@ $$
 Where transition/transversion ratio is given by $$k = \alpha/\beta$$ and the coefficient $$d = (\alpha + 2\beta)t$$ is a used as a proxy of time/distance between two bases. To obtain the full solution for the K2P model, the so-called 'integrating factors' trick should be used in the middle of the derivations.
 
 
-## Python implementation
+## Vectorized Implementation
 
 Under the K2P model with $$k = 2$$, if we let a branch length be $$0.2$$, then the probability transition matrix can be represented as:
 
@@ -275,10 +275,10 @@ This can also be rewritten in terms of probability vectors:
 
 $$
 \begin{align}
-\mathbf{L}_{7} & = \begin{bmatrix} 0.069 & 0.069 & 0.002 & 0.002 \end{bmatrix} \\
-& = \begin{bmatrix} 0.825 & 0.084 & 0.045 & 0.045 \end{bmatrix}  \odot
-        \begin{bmatrix} 0.084 & 0.825 & 0.045 & 0.045 \end{bmatrix}\\
-& = \mathbf{L}_{x} \odot \mathbf{L}_{y},
+\mathbf{L}_{7}  = \begin{bmatrix} 0.069 \\ 0.069 \\ 0.002 \\ 0.002 \end{bmatrix} 
+ = \begin{bmatrix} 0.825 \\ 0.084 \\ 0.045 \\ 0.045 \end{bmatrix}  \odot
+        \begin{bmatrix} 0.084 \\ 0.825 \\ 0.045 \\ 0.045 \end{bmatrix}
+ = \mathbf{L}_{x} \odot \mathbf{L}_{y},
 \end{align}
 $$
 
@@ -287,11 +287,11 @@ where $$\odot$$ represents element-wise multiplication. Notice that $$\mathbf{L}
 $$
 \begin{align}
 \mathbf{L}_{x} 
-& = \underbrace{ \begin{bmatrix} 1 & 0 & 0 & 0 \end{bmatrix}}_{T} \mathbf{P}(0.2)  
-= \mathbf{L}_{1}\mathbf{P}(0.2)\\
+& =  \mathbf{P}(0.2)  \underbrace{ \begin{bmatrix} 1 & 0 & 0 & 0 \end{bmatrix}^{\top}}_{T}
+= \mathbf{P}(0.2)\mathbf{L}_{1}\\
 \mathbf{L}_{y} 
-& = \underbrace{\begin{bmatrix} 0 & 1 & 0 & 0 \end{bmatrix} }_{C} \mathbf{P}(0.2) 
-= \mathbf{L}_{2}\mathbf{P}(0.2).
+& =  \mathbf{P}(0.2) \underbrace{\begin{bmatrix} 0 & 1 & 0 & 0 \end{bmatrix}^{\top} }_{C}
+= \mathbf{P}(0.2)\mathbf{L}_{2}.
 \end{align}
 $$
 
@@ -299,23 +299,83 @@ Here, $$\mathbf{L}_{1}$$ and $$\mathbf{L}_{2}$$ represent the one-hot encoding r
 
 $$
 \begin{align}
-\mathbf{L}_{7} & = \mathbf{L}_{x} \odot \mathbf{L}_{y}  = \mathbf{L}_{1}\mathbf{P}(0.2) \odot \mathbf{L}_{2}\mathbf{P}(0.2).
+\mathbf{L}_{7} & = \mathbf{L}_{x} \odot \mathbf{L}_{y}  = \mathbf{P}(0.2)\mathbf{L}_{1} \odot \mathbf{P}(0.2)\mathbf{L}_{2}.
 \end{align}
 $$
 
-Generally, for a parent node $$k$$ and child nodes $$i$$ and $$j$$, with branch lengths $$t_i$$ and $$t_j$$, respectively, we have the following recursive relation:
+This result follows from the general formula for the conditional probability at a given node in the tree.
+
+Generally, for a parent node $$k$$ and child nodes $$i$$ and $$j$$, with branch lengths $$t_i$$ and $$t_j$$, respectively, the conditional probability is given by the following recursive relation:
 
 $$
 \begin{align}
-\mathbf{L}_{k} = \mathbf{L}_{i}\mathbf{P}(t_i) \odot \mathbf{L}_{j}\mathbf{P}(t_j) \text{ .}
+\mathbf{L}_{k} = \mathbf{P}(t_i)\mathbf{L}_{i} \odot \mathbf{P}(t_j)\mathbf{L}_{j} \text{ .}
 \end{align}
 $$
 
-From there, it follows the Felsenstein pruning algorithm. As mentioned above, we are fixing the branch lengths and the substitution parameter. Determining the branch lengths and substitution parameters given a tree toplogy requires further derivations (e.g., second-order optimization of the likelihood function), which are not straightforward from the above derivations. This will be the focus of another blog post. For now, by fixing all these parameters, here is a possible implementation of the tree's likelihood.
+To see why, let us begin from the definition of the conditional probability at an internal node $k$ for state $x_k$:
+
+$$
+\begin{align}
+L_{k}(x_k) = \left( \sum_{x_i}P_{x_k,x_i}(t_i)L_i(x_i) \right) \times \left( \sum_{x_j}P_{x_k,x_j}(t_j)L_j(x_j) \right)
+\end{align}
+$$
+
+Recall that $x_i \in \\{T,C,A,G\\}$ represent all possible states.  Consider the first term in the product:
+
+$$
+\begin{align}
+\sum_{x_i}P_{x_k,x_i}(t_i)L_i(x_i) & = P_{x_k,T}(t_i)L_i(T) + \dots + P_{x_k,G}(t_i)L_i(G)\\
+& =\begin{bmatrix} P_{x_k,T}(t_i) & \dots & P_{x_k,G}(t_i) \end{bmatrix}
+\begin{bmatrix} L_i(T) \\ \vdots \\ L_i(G) \end{bmatrix}\\
+& = \mathbf{P}(t_i)_{k:} \, \mathbf{L}_i
+\end{align}
+$$
+
+Where $$\mathbf{P}(t_i)_{k:}$$ denotes the row of the state $k$ in the probability transition matrix $\mathbf{P}(t_i)$. We make similar re-arrangement to the second term of the multiplication such that $L_{k}(x_k)$ can be re-writen as:
+
+$$
+\begin{align}
+L_{k}(x_k) = \mathbf{P}(t_i)_{k:} \, \mathbf{L}_i \, \times  \mathbf{P}(t_j)_{k:} \, \mathbf{L}_j
+\end{align}
+$$
+
+Now stacking for all the states: 
+
+$$
+\begin{align}
+L_{k}(T) & = \mathbf{P}(t_i)_{T:} \, \mathbf{L}_i  \times  \mathbf{P}(t_j)_{T:} \, \mathbf{L}_j\\
+& \vdots \\
+L_{k}(G) & = \mathbf{P}(t_i)_{G:} \, \mathbf{L}_i  \times  \mathbf{P}(t_j)_{G:} \, \mathbf{L}_j\\
+\end{align}
+$$
+
+The left-hand side corresponds to the conditional probability vector $\mathbf{L}_k$ for node $k$. The right-hand side can be interpreted as the elementwise product of two column vectors:
+
+$$
+\begin{align}
+\mathbf{L}_{k} & = 
+\begin{bmatrix} 
+\mathbf{P}(t_i)_{T:}  \\
+\vdots\\
+\mathbf{P}(t_i)_{G:}
+\end{bmatrix} \mathbf{L}_i
+\odot
+\begin{bmatrix} 
+\mathbf{P}(t_j)_{T:} \\
+\vdots\\
+\mathbf{P}(t_j)_{G:}
+\end{bmatrix} \mathbf{L}_j = \mathbf{P}(t_i)\mathbf{L}_i \odot\mathbf{P}(t_j)\mathbf{L}_j
+\end{align}
+$$
+
+which gives a vectorized recursive relation. Vector operations are generally more efficient to handle than long summations in various programming languages such as Python.
 
 
 ### Kimura's two-parameters 
 
+As mentioned above, we are fixing the branch lengths and the substitution parameters. Determining the branch lengths and substitution parameters given a tree topology requires further derivations (e.g., second-order optimization of the likelihood function), which are not straightforward from the above derivations. This will be the focus of another blog post. For now, by fixing all these parameters, here is a possible implementation of the tree's likelihood assuming the K2P model:
+    
 ```python
 import math
 import numpy as np
@@ -389,8 +449,8 @@ def dfs(n):
         # calculate children's likelihoods
         t_l = tree[left]['blen']
         t_r = tree[right]['blen']
-        Lx = tree[left]['L'] @ P_mat(t_l, 2)
-        Ly = tree[right]['L'] @ P_mat(t_r, 2)
+        Lx = P_mat(t_l, 2) @ tree[left]['L']
+        Ly = P_mat(t_r, 2) @ tree[right]['L']
         # calculate ancestor's likelihoods
         tree[n]['L'] = Lx * Ly
 ```
@@ -410,7 +470,8 @@ dfs(0)
 5
 ```
 
-Now, if we see our tree after the recursive calls:
+Printed nodes are from the recursive calls, which essentially represent the [topological sorting](https://en.wikipedia.org/wiki/Topological_sorting) of the tree. Now, if we see our tree after the recursive calls:
+
 ```python
 print(tree)
 ```
