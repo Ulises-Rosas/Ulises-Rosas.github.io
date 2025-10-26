@@ -103,7 +103,7 @@ $$
 & = \max \prod_{i}^n P\left(\text{Poi}(\mu_i) = y_i \mid \beta \right) \\
 & \propto \max \prod_{i}^n (\mu_i)^{y_i} \exp(-\mu_i)\\
 \implies \log \max P\left(\beta \mid \mathbf{y}\right)  
-& = \sum_{i=1}^n y_i \log \mu_i - \mu_i
+& \propto \sum_{i=1}^n y_i \log \mu_i - \mu_i
 \end{align}
 $$
 
@@ -122,7 +122,7 @@ $$
 \end{align}
 $$
 
-Obtaining its derivative $\mathcal{L}$ respect to $\beta$ we have:
+Obtaining the derivative $\mathcal{L}$ with respect to $\beta$ we have:
 
 $$
 \begin{align}
@@ -162,7 +162,7 @@ $$
 \end{align}
 $$
 
-Obtaining its derivative $\mathcal{L}$ respect to $\beta$:
+Obtaining the of derivative $\mathcal{L}$ with respect to $\beta$:
 
 $$
 \begin{align}

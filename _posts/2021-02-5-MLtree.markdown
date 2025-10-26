@@ -418,19 +418,19 @@ def P_mat(d,k):
             ])
 ```
 
-Here is a possible tree representation in Fig. 1:
+We can represent tree of Fig. 1 as it were a directed graph. Considering this, here is a adjacent list representation of the tree:
 
 ```python
 tree = {   
-  0: {'L': None, 'daughters': [6, 8], 'parent': None, 'blen': 0.0},
-  1: {'L': [1, 0, 0, 0], 'daughters': [], 'parent': 7, 'blen': 0.2},
-  2: {'L': [0, 1, 0, 0], 'daughters': [], 'parent': 7, 'blen': 0.2},
-  3: {'L': [0, 0, 1, 0], 'daughters': [], 'parent': 6, 'blen': 0.2},
-  4: {'L': [0, 1, 0, 0], 'daughters': [], 'parent': 8, 'blen': 0.2},
-  5: {'L': [0, 1, 0, 0], 'daughters': [], 'parent': 8, 'blen': 0.2},
-  6: {'L': None, 'daughters': [3, 7], 'parent': 0, 'blen': 0.1},
-  7: {'L': None, 'daughters': [1, 2], 'parent': 6, 'blen': 0.1},
-  8: {'L': None, 'daughters': [4, 5], 'parent': 0, 'blen': 0.1}, 
+  0: {'L': None, 'daughters': [6, 8], 'blen': 0.0},
+  1: {'L': [1, 0, 0, 0], 'daughters': [], 'blen': 0.2},
+  2: {'L': [0, 1, 0, 0], 'daughters': [], 'blen': 0.2},
+  3: {'L': [0, 0, 1, 0], 'daughters': [], 'blen': 0.2},
+  4: {'L': [0, 1, 0, 0], 'daughters': [], 'blen': 0.2},
+  5: {'L': [0, 1, 0, 0], 'daughters': [], 'blen': 0.2},
+  6: {'L': None, 'daughters': [3, 7], 'blen': 0.1},
+  7: {'L': None, 'daughters': [1, 2], 'blen': 0.1},
+  8: {'L': None, 'daughters': [4, 5], 'blen': 0.1}, 
 }
 ```
 
@@ -455,7 +455,7 @@ def dfs(n):
         tree[n]['L'] = Lx * Ly
 ```
 
-Let's run this function from the node 0
+Let's run this function from the node 0 (source node)
 
 ```python
 dfs(0)
@@ -478,24 +478,20 @@ print(tree)
 ```
 {0: {'L': array([1.12371115e-04, 1.83822624e-03, 7.51370241e-05, 1.36379296e-05]),
   'daughters': [6, 8],
-  'parent': None,
   'blen': 0.0},
- 1: {'L': [1, 0, 0, 0], 'daughters': [], 'parent': 7, 'blen': 0.2},
- 2: {'L': [0, 1, 0, 0], 'daughters': [], 'parent': 7, 'blen': 0.2},
- 3: {'L': [0, 0, 1, 0], 'daughters': [], 'parent': 6, 'blen': 0.2},
- 4: {'L': [0, 1, 0, 0], 'daughters': [], 'parent': 8, 'blen': 0.2},
- 5: {'L': [0, 1, 0, 0], 'daughters': [], 'parent': 8, 'blen': 0.2},
+ 1: {'L': [1, 0, 0, 0], 'daughters': [], 'blen': 0.2},
+ 2: {'L': [0, 1, 0, 0], 'daughters': [], 'blen': 0.2},
+ 3: {'L': [0, 0, 1, 0], 'daughters': [], 'blen': 0.2},
+ 4: {'L': [0, 1, 0, 0], 'daughters': [], 'blen': 0.2},
+ 5: {'L': [0, 1, 0, 0], 'daughters': [], 'blen': 0.2},
  6: {'L': array([0.00300556, 0.00300556, 0.00434364, 0.00044365]),
   'daughters': [3, 7],
-  'parent': 0,
   'blen': 0.1},
  7: {'L': array([0.06953344, 0.06953344, 0.00205366, 0.00205366]),
   'daughters': [1, 2],
-  'parent': 6,
   'blen': 0.1},
  8: {'L': array([0.00710204, 0.68077648, 0.00205366, 0.00205366]),
   'daughters': [4, 5],
-  'parent': 0,
   'blen': 0.1}}
 ```
 
