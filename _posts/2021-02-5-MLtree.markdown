@@ -470,7 +470,7 @@ dfs(0)
 5
 ```
 
-Printed nodes are from the recursive calls, which is the post-order traversal of the tree and it is closely related to the [topological sorting](https://en.wikipedia.org/wiki/Topological_sorting) of the tree. It is not difficult to see that either type of order can lead to the same result in the tree. This is useful when implementing non-recursive algorithms. Now, if we see our tree after the recursive calls:
+Printed nodes are from the recursive calls, which is the pre-order traversal of the tree and it is one [topological sorting](https://en.wikipedia.org/wiki/Topological_sorting) of the tree when the queue is updated with left children first. This is useful when implementing non-recursive algorithms, which are more efficient than recursive ones. Now, if we see our tree after the recursive calls:
 
 ```python
 print(tree)
