@@ -102,7 +102,7 @@ $$
 \max P\left(\{\text{Poi}(\mu_i) = y_i\}_{i = 1}^{n} \mid  \beta\right)
 & = \max \prod_{i}^n P\left(\text{Poi}(\mu_i) = y_i \mid \beta \right) \\
 & \propto \max \prod_{i}^n (\mu_i)^{y_i} e^{-\mu_i}\\
-\implies \log \max P\left(\beta \mid \mathbf{y}\right)  
+\implies \max \log  P\left(\beta \mid \mathbf{y}\right)  
 & \propto \sum_{i=1}^n y_i \log \mu_i - \mu_i
 \end{align}
 $$
@@ -288,9 +288,8 @@ Poisson regression using Newton-Raphson:
 def poisson_reg(X, y, max_iter=100):
     _,p = X.shape
     b = np.zeros(p)
-
+    f_old = X @ b
     for _ in range(max_iter):
-        f_old = X @ b
         mu = np.exp(f_old)
         # Gradient and Hessian
         G = X.T @ ( y - mu )
@@ -303,7 +302,8 @@ def poisson_reg(X, y, max_iter=100):
         f_diff = np.max(np.abs(f_new - f_old))
         if f_diff/f_max < 1e-6:
             break
-
+        f_old = f_new
+        
     return b
 ```
 

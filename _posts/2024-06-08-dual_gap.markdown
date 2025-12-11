@@ -169,7 +169,7 @@ One of these two cases clearly gives us a feasible and more useful lower bound. 
 
 ## Taken everything together
 
-Now we are ready to substitute the value of $\mathbf{z}$ and the condition for $T_{2,j}$ into our initial Lagrangian function. Let us start with $T_1$, and apply some linear al-Jabr:
+Now we are ready to substitute the value of $\mathbf{z}$ and the condition for $T_{2,j}$ into our initial Lagrangian function. Let us start with $T_1$, and apply some linear algebra:
 
 $$
 \begin{align}
@@ -322,7 +322,7 @@ d_obj = c1  * ( norm(y)**2 - norm(y - alpha*n*theta)**2 )
 print(f"sklearn dual gap: {clf2.dual_gap_}")
 print(f"Implemented dual gap: {p_obj - d_obj}")
 # sklearn dual gap: 9.04182059547759e-05
-# Implemented scratch dual gap: 9.04182059547759e-05
+# Implemented dual gap: 9.04182059547759e-05
 ```
 
 If you are using an older version of `scikit-learn`, such as `0.23.2`, the dual gap may differ by a factor of 100. This was a bug that has been fixed in more recent versions of`scikit-learn`.
